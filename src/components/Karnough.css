@@ -1,0 +1,72 @@
+.experiment-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.pv-canvas {
+  border: 2px solid #222;
+  background: #fff;
+}
+
+.experiment-container {
+  padding: 20px;
+  text-align: center;
+}
+
+/* ================= SIDE BY SIDE ================= */
+.experiment-row {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  gap: 20px;
+}
+
+ .video-panel {
+  flex: 0.8;                   /* smaller */
+  display: flex;
+  justify-content: flex-end;   /* push video to the right */
+  align-items: center;
+ 
+}
+
+.graph-panel {
+  flex: 1.2;                   /* more space for graph */
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+
+/* ================= VIDEO ================= */
+.video-wrapper {
+  width: 100%;
+  max-width: 520px;
+  height: 520px;
+  border: 2px solid #222;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.experiment-video {
+  width: 100%;                 /* show FULL video */
+  height: 100%;
+  object-fit: contain;         /* no crop */
+}
+
+/* ================= GRAPH ================= */
+.graph-panel canvas {
+  width: 520px;
+  height: 520px;
+  border: 2px solid #222;
+  background: #fff;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+  .experiment-row {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,304 @@
+/* ======================================================
+   GLOBAL RESET
+   ====================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+
+  background: #000;
+  color: #fff;
+  font-family: monospace;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* ======================================================
+   ROOT LAYOUT
+   ====================================================== */
+.dexter-root {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+
+  width: 100%;
+  min-height: 100vh;
+
+  background: radial-gradient(circle at top, #050505, #000 75%);
+}
+
+/* ======================================================
+   LEFT CONTROL PANEL
+   ====================================================== */
+.control-panel {
+  width: 220px;
+  padding: 20px;
+
+  background: linear-gradient(180deg, #080808, #020202);
+  border-right: 3px solid #111;
+
+  box-shadow:
+    inset -6px 0 12px rgba(0,0,0,0.9),
+    4px 0 12px rgba(0,0,0,0.7);
+}
+
+.control-panel h2 {
+  margin-bottom: 22px;
+  text-align: center;
+  color: #7cff00;
+  letter-spacing: 2px;
+}
+
+.control-panel button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+
+  background: linear-gradient(#1a1a1a, #050505);
+  color: #7cff00;
+
+  border-radius: 6px;
+  border: 1px solid #222;
+
+  cursor: pointer;
+}
+
+.control-panel button.active {
+  box-shadow:
+    0 0 14px rgba(124,255,0,0.6),
+    inset 0 0 0 2px rgba(124,255,0,0.4);
+}
+
+button.laser {
+  background: linear-gradient(90deg, #ff0040, #ff00ff);
+  color: #fff;
+  font-weight: bold;
+}
+
+/* ======================================================
+   CANVAS COLUMN
+   ====================================================== */
+.canvas-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ======================================================
+   CANVAS CONTAINER
+   ====================================================== */
+.canvas-container-black {
+  padding-top: 32px;
+}
+
+canvas {
+  width: 700px;
+  max-width: 95vw;
+  height: auto;
+  aspect-ratio: 700 / 420;
+
+  background: #000;
+  border-radius: 12px;
+  border: 1px solid #111;
+
+  box-shadow:
+    inset 0 0 40px rgba(0,255,0,0.08),
+    0 0 40px rgba(0,0,0,0.9);
+}
+
+/* ======================================================
+   ENERGY PANEL (BELOW CANVAS)
+   ====================================================== */
+.energy-panel {
+  width: 100%;
+  max-width: 700px;
+
+  margin: 36px auto 40px;
+  padding: 32px 28px;
+
+  background: linear-gradient(180deg, #060606, #000);
+  border-top: 3px solid #111;
+
+  box-shadow:
+    inset 0 8px 18px rgba(0,0,0,0.95),
+    0 -6px 18px rgba(0,0,0,0.7);
+
+  display: flex;
+  flex-direction: column;
+  gap: 56px; /* 🔥 BIG SPACE */
+}
+
+/* ======================================================
+   SLIDER BLOCK (SELECTABLE)
+   ====================================================== */
+.slider-block {
+  padding: 18px 22px 28px;
+  border-radius: 16px;
+
+  background: linear-gradient(180deg, #090909, #020202);
+  border: 1px solid #222;
+
+  opacity: 0.28;
+  cursor: pointer;
+
+  transition:
+    opacity 0.25s ease,
+    transform 0.2s ease,
+    box-shadow 0.25s ease;
+}
+
+.slider-block:hover {
+  opacity: 0.55;
+}
+
+.slider-block.active {
+  opacity: 1;
+  transform: scale(1.015);
+
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,0.6),
+    0 0 28px rgba(0,255,0,0.35),
+    0 0 60px rgba(0,255,0,0.15);
+}
+
+/* ======================================================
+   SLIDER TITLE
+   ====================================================== */
+.slider-title {
+  text-align: center;
+  margin-bottom: 18px;
+
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  color: #fff;
+  user-select: none;
+}
+
+/* ======================================================
+   SLIDER WRAP
+   ====================================================== */
+.slider-wrap {
+  position: relative;
+  width: 100%;
+}
+
+/* ======================================================
+   TOOLTIP (VALUE ONLY)
+   ====================================================== */
+.slider-tooltip {
+  position: absolute;
+  top: -36px;
+  transform: translateX(-50%);
+
+  background: #000;
+  color: #fff;
+
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow:
+    0 0 12px rgba(255,255,255,0.45),
+    0 0 24px rgba(0,255,0,0.35);
+
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ======================================================
+   RANGE SLIDER
+   ====================================================== */
+.energy-slider {
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 100%;
+  height: 6px;
+
+  background: linear-gradient(90deg, #00ff66, #00ffaa);
+  border-radius: 999px;
+
+  outline: none;
+  cursor: pointer;
+
+  filter: drop-shadow(0 0 10px rgba(0,255,0,0.5));
+}
+
+.energy-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 14px rgba(255,255,255,0.9),
+    0 0 30px rgba(0,255,0,0.8);
+}
+
+/* ======================================================
+   EM FIELD VARIANT
+   ====================================================== */
+.energy-slider.em {
+  background: linear-gradient(90deg, #00eaff, #0077ff);
+}
+
+.slider-block.active .energy-slider.em::-webkit-slider-thumb {
+  box-shadow:
+    0 0 14px rgba(120,200,255,0.95),
+    0 0 30px rgba(0,140,255,0.8);
+}
+
+/* ======================================================
+   INACTIVE SLIDERS LOCKED
+   ====================================================== */
+.slider-block:not(.active) .energy-slider {
+  pointer-events: none;
+  filter: grayscale(1) brightness(0.6);
+}
+
+/* ======================================================
+   PARTICLE COLORS
+   ====================================================== */
+.alpha { color: #ff4040; }
+.beta  { color: #00ffff; }
+.gamma { color: #cc66ff; }
+
+/* ======================================================
+   MOBILE
+   ====================================================== */
+@media (max-width: 768px) {
+  .dexter-root {
+    flex-direction: column;
+  }
+
+  .control-panel {
+    width: 100%;
+    border-right: none;
+    border-bottom: 3px solid #111;
+  }
+
+  canvas {
+    width: 100%;
+  }
+
+  .energy-panel {
+    padding: 24px 20px;
+    gap: 44px;
+  }
+}

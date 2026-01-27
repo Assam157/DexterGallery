@@ -1,0 +1,71 @@
+.emlab-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.emlab-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.emlab-video {
+  width: 360px;
+  border: 2px solid #222;
+}
+
+.emlab-canvas {
+  border: 2px solid #222;
+  background: #fff;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.controls label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: white;
+}
+
+.note {
+  margin-top: 10px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+/* ===============================
+   EXPERIMENT WRAPPER
+   =============================== */
+
+.experiment-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  padding: 20px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(10, 18, 35, 0.95),
+    rgba(2, 4, 10, 0.98)
+  );
+
+  border-radius: 18px;
+
+  box-shadow:
+    inset 0 0 30px rgba(0, 150, 255, 0.08),
+    0 0 40px rgba(0, 0, 0, 0.6);
+
+  overflow: auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+

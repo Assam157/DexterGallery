@@ -1,0 +1,55 @@
+.orbital-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.n-level {
+  margin-bottom: 18px;
+}
+
+.n-label {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.orbital-row {
+  display: flex;
+  gap: 20px;
+}
+
+.orbital-block {
+  text-align: center;
+}
+
+.orbital-name {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.orbital-box {
+  width: 70px;
+  height: 45px;
+  border: 2px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.electron {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.electron.up {
+  color: blue;
+}
+
+.electron.down {
+  color: red;
+}

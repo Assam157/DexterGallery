@@ -1,0 +1,103 @@
+ /* ===============================
+   GLOBAL MOBILE SAFETY
+   =============================== */
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;                 /* allow vertical scroll */
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ===============================
+   CHEM LAB PANEL — MOBILE SAFE
+   =============================== */
+
+.chem-lab,
+.lab-panel,
+.lab-controls {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Make entire lab scrollable on mobile */
+@media (max-width: 768px) {
+  .chem-lab,
+  .lab-panel {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;               /* 🔑 scroll */
+    overflow-x: hidden;
+    padding-bottom: 24px;
+  }
+}
+
+/* ===============================
+   PANEL TITLE
+   =============================== */
+
+.lab-panel-title {
+  font-weight: bold;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+  font-size: 16px;
+  text-align: center;
+}
+
+/* ===============================
+   BUTTONS — TOUCH FRIENDLY
+   =============================== */
+
+.panel-btn {
+  width: 100%;
+  padding: 14px 16px;               /* 👆 finger sized */
+  margin-bottom: 10px;
+  border-radius: 12px;
+  font-size: 15px;
+}
+
+.panel-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   SELECT / INPUT — MOBILE READY
+   =============================== */
+
+select,
+input,
+button {
+  font-size: 16px;                  /* 🔑 prevents iOS zoom */
+  touch-action: manipulation;
+}
+
+/* Dropdowns */
+select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  background: #0f172a;
+  color: #fff;
+  border: 1px solid #334155;
+  border-radius: 10px;
+}
+
+/* Sliders */
+input[type="range"] {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* ===============================
+   SCROLLABLE SUB-PANELS (if any)
+   =============================== */
+
+.lab-scroll-area {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: 70vh;                 /* avoids overflow trap */
+}

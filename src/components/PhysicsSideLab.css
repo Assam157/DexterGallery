@@ -1,0 +1,48 @@
+.lab-page {
+  display: flex;
+  gap: 12px;
+  background: #eef2ff;
+  padding: 12px;
+}
+
+.lab-sidebar {
+  width: 220px;
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.lab-sidebar button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.lab-sidebar button.active {
+  background: #2563eb;
+  color: white;
+}
+
+.lab-content {
+  flex: 1;
+}
+
+.lab {
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.lab canvas {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.lab-buttons button {
+  margin-right: 8px;
+}

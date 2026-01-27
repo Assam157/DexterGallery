@@ -1,0 +1,30 @@
+.bandgap-root {
+  width: 520px;
+  margin: auto;
+  background: radial-gradient(#ffffff, #f0f0f0);
+  padding: 18px;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+canvas {
+  background: #fff;
+  border-radius: 12px;
+  border: 2px solid #aaa;
+}
+
+button {
+  margin-top: 16px;
+  padding: 10px 26px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(#005f99, #003f66);
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: linear-gradient(#007acc, #005080);
+}

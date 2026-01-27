@@ -1,0 +1,215 @@
+/* ======================================================
+   ORBITAL EXCITATION EXPERIMENT – FULL CSS (WHITE TEXT)
+   ====================================================== */
+
+/* ---------- ROOT ---------- */
+.experiment {
+  width: 100%;
+  height: 100%;
+
+  padding: 12px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background: transparent;
+  color: #ffffff;
+}
+
+/* ---------- TITLE ---------- */
+.experiment h2 {
+  margin: 0 0 10px 0;
+  text-align: center;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  color: #ffffff;
+}
+
+/* ---------- ORBITAL TABLE ---------- */
+.orbital-table {
+  flex: 1;
+
+  overflow-x: auto;
+  overflow-y: auto;
+
+  padding-bottom: 6px;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ---------- ORBITAL ROW ---------- */
+.orbital-row {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+  margin-bottom: 6px;
+
+  white-space: nowrap;
+}
+
+/* ---------- LABELS ---------- */
+.n-label {
+  min-width: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.orbital-label {
+  min-width: 44px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ---------- BOX ROW ---------- */
+.box-row {
+  display: flex;
+  gap: 4px;
+}
+
+/* ---------- ORBITAL BOX ---------- */
+.orbital-box {
+  width: 26px;
+  height: 26px;
+
+  border: 1.5px solid #ffffff;
+  border-radius: 4px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+}
+
+/* ---------- ELECTRONS ---------- */
+.electron {
+  font-size: 14px;
+  line-height: 1;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.electron.up {
+  color: #ffffff;
+}
+
+.electron.down {
+  color: #ffffff;
+}
+
+/* ---------- CONTROLS ---------- */
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+
+  padding-top: 8px;
+}
+
+.controls button {
+  padding: 8px 16px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+
+  border: 1.5px solid #ffffff;
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.controls button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.controls button.reset {
+  background: rgba(255, 80, 80, 0.15);
+}
+
+/* ======================================================
+   MOBILE OPTIMIZATION
+   ====================================================== */
+
+@media (max-width: 768px) {
+
+  .experiment {
+    padding: 8px;
+  }
+
+  .experiment h2 {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+
+  .orbital-row {
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  .n-label,
+  .orbital-label {
+    font-size: 12px;
+    min-width: 34px;
+  }
+
+  .orbital-box {
+    width: 22px;
+    height: 22px;
+  }
+
+  .electron {
+    font-size: 12px;
+  }
+
+  .controls button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+/* ======================================================
+   EXTRA SMALL DEVICES
+   ====================================================== */
+
+@media (max-width: 420px) {
+
+  .orbital-box {
+    width: 20px;
+    height: 20px;
+  }
+
+  .electron {
+    font-size: 11px;
+  }
+
+  .n-label,
+  .orbital-label {
+    font-size: 11px;
+    min-width: 30px;
+  }
+}
+/* =====================================
+   ELECTRON COLOR CODING
+   ===================================== */
+
+.electron.up {
+  color: #ff3b3b; /* red ↑ */
+}
+
+.electron.down {
+  color: #3b82ff; /* blue ↓ */
+}
