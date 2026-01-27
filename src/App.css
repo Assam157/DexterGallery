@@ -1,0 +1,285 @@
+/* =========================================================
+   GLOBAL RESET & BASE (Tailwind-like sane defaults)
+   ========================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, Ubuntu, Cantarell, "Helvetica Neue",
+               Arial, "Noto Sans", sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+button, input, select {
+  font-family: inherit;
+}
+
+/* =========================================================
+   FLEX HELPERS (Tailwind-like utilities)
+   ========================================================= */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gap-sm { gap: 8px; }
+.gap-md { gap: 12px; }
+.gap-lg { gap: 16px; }
+
+/* =========================================================
+   LAB PAGE LAYOUT
+   ========================================================= */
+.lab-page,
+.sidebar-lab-root {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* Sidebar */
+.sidebar,
+.lab-sidebar {
+  width: 220px;
+  min-width: 200px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+/* Lab content area */
+.lab-view,
+.lab-content {
+  flex: 1;
+  min-width: 0; /* CRITICAL for mobile */
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  overflow-x: auto;
+}
+
+/* =========================================================
+   CANVAS RESPONSIVENESS (MOST IMPORTANT PART)
+   ========================================================= */
+
+/* Canvas container (wrap all canvas inside a div if possible) */
+.canvas-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* All canvas elements */
+canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+
+  /* Prevent overflow on mobile */
+  touch-action: none;
+
+  /* Nice look */
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+/* Scale canvas down on small screens */
+@media (max-width: 768px) {
+  canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+}
+
+/* =========================================================
+   LAB PANELS & CONTROLS
+   ========================================================= */
+.lab,
+.digital-lab,
+.control-panel,
+.info-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+input[type="range"],
+select {
+  width: 100%;
+}
+
+/* Buttons */
+button {
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background: #e5e7eb;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background: #c7d2fe;
+}
+
+button.active {
+  background: #2563eb;
+  color: white;
+}
+
+/* =========================================================
+   MOBILE STACKING (VERY IMPORTANT)
+   ========================================================= */
+@media (max-width: 900px) {
+  .lab-page,
+  .sidebar-lab-root {
+    flex-direction: column;
+  }
+
+  .sidebar,
+  .lab-sidebar {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .lab-view,
+  .lab-content {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   DIGITAL LAB DARK MODE SUPPORT
+   ========================================================= */
+.digital-lab {
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.digital-lab canvas {
+  background: #020617;
+}
+
+/* =========================================================
+   SCROLL SAFETY (no hidden canvas)
+   ========================================================= */
+body {
+  overflow-x: hidden;
+}
+/* =========================================================
+   UNIFIED VIEW LOGIC (DESKTOP + MOBILE CONSISTENCY)
+   ========================================================= */
+
+/* 1️⃣ HARD STOP horizontal overflow everywhere */
+html,
+body,
+.lab-page,
+.sidebar-lab-root,
+.lab-view,
+.lab-content {
+  max-width: 100vw;
+  overflow-x: hidden !important;
+}
+
+/* 2️⃣ Force lab content to CENTER like desktop */
+.lab-view,
+.lab-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 3️⃣ SAFE CANVAS CONTAINMENT */
+.lab-view canvas,
+.lab-content canvas {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* 4️⃣ DEFINE A CONSISTENT "VIRTUAL VIEWPORT" */
+:root {
+  --virtual-width: 700px;
+  --virtual-height: 420px;
+}
+
+/* Wrap canvas-based experiments inside this if possible */
+.virtual-viewport {
+  width: var(--virtual-width);
+  height: var(--virtual-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* 5️⃣ MOBILE BEHAVIOR — SCALE, DON'T RESTRUCTURE */
+@media (max-width: 900px) {
+
+  /* Keep layout same, just stacked */
+  .lab-page,
+  .sidebar-lab-root {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Sidebar behaves like a top panel */
+  .sidebar,
+  .lab-sidebar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Lab view should FEEL like desktop, just smaller */
+  .lab-view,
+  .lab-content {
+    width: 100%;
+    padding: 8px;
+  }
+
+  /* Canvas never exceeds screen */
+  canvas {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* 6️⃣ VERY SMALL PHONES (STRICT SAFETY) */
+@media (max-width: 480px) {
+
+  /* Prevent tall overflow */
+  .lab-view,
+  .lab-content {
+    min-height: unset;
+    max-height: calc(100dvh - 120px);
+  }
+
+  canvas {
+    max-height: 80dvh;
+  }
+}
