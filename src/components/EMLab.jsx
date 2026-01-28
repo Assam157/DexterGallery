@@ -10,7 +10,7 @@ import VICircuit from "./VLCCircuit";
 import OrbitalBoxes from "./ElectronBoxes";
 
 import "./EMLab.css";
-import "./ExperimentLayout.css"
+ 
 
 /* ================= GLOBAL CANVAS SIZE ================= */
 const GLOBAL_W = 1000;

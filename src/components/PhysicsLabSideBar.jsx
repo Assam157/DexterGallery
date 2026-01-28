@@ -7,6 +7,13 @@ import CharlesLawExperiment from "./CharlesLawExperiment";
 import CarnotEngineExperiment from "./KarnoughCycle";
 import HeatingCurveWithParticles from "./StateTemp";
 import PendulumEnergyLab from "./PendulamExperiment";
+import DampedPendulumEnergyLab from "./DampedPendulamExperiment";
+import HorizontalSpringWithFriction from "./SHMHorizental";
+import BuoyancyLab from "./WaterBuyoncy";
+import SHMLab from "./SHMexperiment";
+import StaticElectricityLab from "./StaticElectricity";
+import MomentumConservationLab from "./LawOfCOnservationOfMomentum";
+import NewtonThirdLawLab from "./NewtonsThirdLaw";
 
 import "./SidebarPhysicsLab.css";
 
@@ -36,6 +43,12 @@ export default function SidebarPhysicsLab() {
         >
           🚀 Projectile Motion
         </button>
+        <button
+          className={activeLab === "shm" ? "active" : ""}
+          onClick={() => setActiveLab("shm")}
+        >
+           SHM (Simple Harmonic Motion)
+        </button>
 
         <button
           className={activeLab === "inverse" ? "active" : ""}
@@ -43,12 +56,24 @@ export default function SidebarPhysicsLab() {
         >
           🌍 Inverse Square Law
         </button>
+         <button
+          className={activeLab === "horizentalshm" ? "active" : ""}
+          onClick={() => setActiveLab("horizentalshm")}
+        >
+           SHM_Horizental
+        </button>
 
         <button
           className={activeLab === "pendulam" ? "active" : ""}
           onClick={() => setActiveLab("pendulam")}
         >
           Pendulum Lab
+        </button>
+        <button
+          className={activeLab === "damp_pendulam" ? "active" : ""}
+          onClick={() => setActiveLab("damp_pendulam")}
+        >
+          Damped Pendulum Lab
         </button>
 
         <button
@@ -71,6 +96,33 @@ export default function SidebarPhysicsLab() {
         >
           Heating State Change
         </button>
+         <button
+          className={activeLab === "buyoncy" ? "active" : ""}
+          onClick={() => setActiveLab("buyoncy")}
+        >
+           Water Buyoncy Experiment
+        </button>
+        <button
+  className={activeLab === "static" ? "active" : ""}
+  onClick={() => setActiveLab("static")}
+>
+  ⚡ Static Electricity
+</button>
+
+<button
+  className={activeLab === "momentum" ? "active" : ""}
+  onClick={() => setActiveLab("momentum")}
+>
+  🚀 Momentum Conservation
+</button>
+
+<button
+  className={activeLab === "thirdlaw" ? "active" : ""}
+  onClick={() => setActiveLab("thirdlaw")}
+>
+  🔄 Newton's Third Law
+</button>
+
       </div>
 
       {/* ================= LAB VIEW ================= */}
@@ -90,6 +142,13 @@ export default function SidebarPhysicsLab() {
             {activeLab === "karnough" && <CarnotEngineExperiment />}
             {activeLab === "heat" && <HeatingCurveWithParticles />}
             {activeLab === "pendulam" && <PendulumEnergyLab />}
+            {activeLab === "damp_pendulam" && <DampedPendulumEnergyLab/>}
+            {activeLab === "shm" && <SHMLab/>}
+            {activeLab === "horizentalshm" && <HorizontalSpringWithFriction/>}
+            {activeLab === "buyoncy" && <BuoyancyLab/>}
+            {activeLab === "static" && <StaticElectricityLab />}
+            {activeLab === "momentum" && <MomentumConservationLab />}
+            {activeLab === "thirdlaw" && <NewtonThirdLawLab />}
           </div>
         </div>
       </div>
