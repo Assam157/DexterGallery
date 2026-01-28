@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+  import React, { useEffect, useRef, useState } from "react";
 import "./EMLab.css";
 
 const W = 1600;
@@ -7,12 +7,20 @@ const H = 920;
 export default function BandGapExperiment() {
   const canvasRef = useRef(null);
   const [energy, setEnergy] = useState(0.2);
-  const [activeSlider,setActiveSlider]=useState(0);
+  const [activeSlider,setActiveSLider]=useState("");
 
-  // 🔑 persistent refs (this was missing before)
+  /* ===== Refs ===== */
   const prevLevelRef = useRef(null);
-  const emissionTimerRef = useRef(0);
-  const emissionYRef = useRef(null);
+
+  // Emission (downward)
+  const emitPhoton = useRef(false);
+  const emitT = useRef(0);
+  const emitY = useRef(0);
+
+  // Absorption (upward)
+  const absorbPhoton = useRef(false);
+  const absorbT = useRef(0);
+  const absorbY = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -20,6 +28,10 @@ export default function BandGapExperiment() {
 
     let t = 0;
     let raf;
+
+    const BANDGAP_X = 550;
+    const EMIT_X = 650;
+    const ABSORB_START_X = 350;
 
     function clear() {
       ctx.fillStyle = "#000";
@@ -51,108 +63,58 @@ export default function BandGapExperiment() {
       ctx.shadowBlur = 0;
     }
 
-    /* ================= PHOTON WAVES ================= */
-let verticalWaveStartTime = null;
-const VERTICAL_WAVE_LIFETIME = 5000; // 5 seconds
+    /* ================= ATOM-STYLE PHOTON WAVE ================= */
+ /* ================= PHOTON WAVES ================= */
 
-function drawOutgoingVerticalWave(x0, y0) {
-
-  // Start lifetime timer once
-  if (verticalWaveStartTime === null) {
-    verticalWaveStartTime = performance.now();
-  }
-
-  // Check lifetime
-  const elapsed = performance.now() - verticalWaveStartTime;
-  if (elapsed > VERTICAL_WAVE_LIFETIME) {
-    return; // stop drawing after 5 seconds
-  }
-
+// Incoming photon (absorption) → left → right
+function drawIncomingPhoton(xStart, y) {
   ctx.strokeStyle = "#ffd700";
-  ctx.lineWidth = 1.8;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
 
-  const lines = 5;
-  const spacing = 6;
-    const LEFT_SHIFT = 80; 
+  const Y_OFFSET = -90;
+  const X_OFFSET = -180;
 
-  for (let l = 0; l < lines; l++) {
-    ctx.beginPath();
+  for (let i = 0; i < 140; i++) {
+    const x = xStart + i * 1.5 + X_OFFSET;
 
-    for (let i = 0; i < 90; i++) {
-      const progress = i / 90;
+    const yWave =
+      y +
+      Y_OFFSET +
+      Math.sin(i * 0.5 + t * 0.15) * 10;
 
-      const wave1 = Math.sin(i * 0.5 + t * 0.7 + l) * 9;
-      const wave2 = Math.sin(i * 0.2 + t * 0.4) * 4;
-      const ampFalloff = 1 - progress * 0.65;
-
-       const x =
-        x0 -
-        LEFT_SHIFT +                     // ← left shift
-        (wave1 + wave2) * ampFalloff +
-        l * spacing;
-      const y =
-        y0 -
-        i * 6 +
-        (wave1 - wave2) * ampFalloff;
-
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-
-    ctx.stroke();
+    if (i === 0) ctx.moveTo(x, yWave);
+    else ctx.lineTo(x, yWave);
   }
+
+  ctx.stroke();
+}
+
+// Outgoing photon (emission) → right → left
+function drawOutgoingPhoton(xStart, y) {
+  ctx.strokeStyle = "#ffd700";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+
+  const Y_OFFSET = -90;
+  const X_OFFSET = 180;
+
+  for (let i = 0; i < 140; i++) {
+    const x = xStart - i * 1.5 + X_OFFSET;
+
+    const yWave =
+      y +
+      Y_OFFSET +
+      Math.sin(i * 0.5 + t * 0.15) * 10;
+
+    if (i === 0) ctx.moveTo(x, yWave);
+    else ctx.lineTo(x, yWave);
+  }
+
+  ctx.stroke();
 }
 
 
-  let diagonalWaveStartTime = null;
-const DIAGONAL_WAVE_LIFETIME = 5000; // 5 seconds
-
-function drawOutgoingDiagonalWave(x0, y0) {
-
-  // Start lifetime timer once
-  if (diagonalWaveStartTime === null) {
-    diagonalWaveStartTime = performance.now();
-  }
-
-  // Check lifetime
-  const elapsed = performance.now() - diagonalWaveStartTime;
-  if (elapsed > DIAGONAL_WAVE_LIFETIME) {
-    return; // stop drawing after 5 seconds
-  }
-
-  ctx.strokeStyle = "#ffcc88";
-  ctx.lineWidth = 1.8;
-
-  const lines = 5;
-  const spacing = 6;
-
-  for (let l = 0; l < lines; l++) {
-    ctx.beginPath();
-
-    for (let i = 0; i < 90; i++) {
-      const progress = i / 90;
-
-      const wave1 = Math.sin(i * 0.45 + t * 0.6 + l) * 8;
-      const wave2 = Math.sin(i * 0.18 + t * 0.3) * 4;
-      const ampFalloff = 1 - progress * 0.6;
-
-      const x =
-        x0 +
-        i * 6 +
-        (wave1 + wave2) * ampFalloff +
-        l * spacing;
-
-      const y =
-        y0 +
-        i * 5 +
-        (wave1 - wave2) * ampFalloff -
-        l * spacing;
-
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-
-    ctx.stroke();
-  }
-}
 
 
     function loop() {
@@ -171,16 +133,16 @@ function drawOutgoingDiagonalWave(x0, y0) {
       ctx.setLineDash([6, 6]);
       ctx.strokeStyle = "#aaa";
       ctx.beginPath();
-      ctx.moveTo(550, E1);
-      ctx.lineTo(550, E2);
+      ctx.moveTo(BANDGAP_X, E1);
+      ctx.lineTo(BANDGAP_X, E2);
       ctx.stroke();
       ctx.setLineDash([]);
 
       ctx.fillStyle = "#aaa";
       ctx.font = "15px monospace";
-      ctx.fillText("Eg", 565, (E1 + E2) / 2);
+      ctx.fillText("Eg", BANDGAP_X + 12, (E1 + E2) / 2);
 
-      /* === DETERMINE CURRENT LEVEL === */
+      /* === CURRENT LEVEL === */
       let level, y;
       if (energy < 0.33) {
         level = 0;
@@ -201,54 +163,53 @@ function drawOutgoingDiagonalWave(x0, y0) {
       ctx.strokeStyle = "#ffd700";
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(650, E0);
-      ctx.lineTo(650, y);
+      ctx.moveTo(EMIT_X, E0);
+      ctx.lineTo(EMIT_X, y);
       ctx.stroke();
 
       ctx.beginPath();
-      ctx.moveTo(645, y - 10);
-      ctx.lineTo(650, y);
-      ctx.lineTo(655, y - 10);
+      ctx.moveTo(EMIT_X - 6, y - 10);
+      ctx.lineTo(EMIT_X, y);
+      ctx.lineTo(EMIT_X + 6, y - 10);
       ctx.stroke();
 
-      /* === DETECT DOWNWARD TRANSITION (CORRECT) === */
-      const prevLevel = prevLevelRef.current;
+      /* === TRANSITION DETECTION === */
+      const prev = prevLevelRef.current;
 
-      if (prevLevel !== null && level < prevLevel) {
-        if (prevLevel === 2 && level === 1) {
-          emissionYRef.current = E1;
-          emissionTimerRef.current = 45;
-        }
-        if (prevLevel === 1 && level === 0) {
-          emissionYRef.current = E0;
-          emissionTimerRef.current = 45;
-        }
+      // 🔽 DOWNWARD → emission
+      if (prev !== null && level < prev) {
+        emitPhoton.current = true;
+        emitT.current = 0;
+        emitY.current = y;
       }
- 
 
-if (prevLevel !== null && level > prevLevel) {
-  if (prevLevel === 0 && level === 1) {
-    emissionYRef.current = E0;
-    emissionTimerRef.current = -45;
-  }
-  if (prevLevel === 1 && level === 2) {
-     emissionYRef.current = E1;
-    emissionTimerRef.current = -45;
-  }
-}
-
+      // 🔼 UPWARD → absorption
+      if (prev !== null && level > prev) {
+        absorbPhoton.current = true;
+        absorbT.current = 0;
+        absorbY.current = y;
+      }
 
       prevLevelRef.current = level;
 
-      /* === EMIT PHOTONS (VISIBLE FOR A WHILE) === */
-      if (emissionTimerRef.current < 0) {
-        drawOutgoingVerticalWave(650, emissionYRef.current);
-        emissionTimerRef.current++;
+      /* === EMITTED PHOTON (LEFTWARD) === */
+      if (emitPhoton.current) {
+         drawOutgoingPhoton(
+    EMIT_X,
+    emitY.current
+  );
+        emitT.current += 1.5;
+        if (emitT.current > 140) emitPhoton.current = false;
       }
-      else if (emissionTimerRef.current > 0){
-        drawOutgoingDiagonalWave(650, emissionYRef.current);
-        emissionTimerRef.current--;
-     
+
+      /* === ABSORBED PHOTON (FROM LEFT) === */
+      if (absorbPhoton.current) {
+         drawIncomingPhoton(
+    ABSORB_START_X,
+    absorbY.current
+  );
+        absorbT.current += 1.5;
+        if (absorbT.current > 140) absorbPhoton.current = false;
       }
 
       t++;
@@ -258,6 +219,7 @@ if (prevLevel !== null && level > prevLevel) {
     loop();
     return () => cancelAnimationFrame(raf);
   }, [energy]);
+
   useEffect(() => {
     function onKey(e) {
   

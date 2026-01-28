@@ -10,6 +10,15 @@ html, body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
+/* ================= GLOBAL LAB BACKGROUND ================= */
+
+.lab-root {
+  width: 100vw;
+  height: 100vh;
+  background: #e5e7eb; /* 🔘 light grey */
+  display: flex;
+  overflow: hidden;
+}
 
 /* ===============================
    CHEM LAB PANEL — MOBILE SAFE
