@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useNavigate,BrowserRouter,Routes,Route } from "react-router-dom";
+ import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./RadiationDexterLab.css";
-import DiodeBiasLab from "./PN-JunctionDiodeShwoing";
-import PNJunctionDiffusion from "./PNJunctionDIode";
 
 const W = 700;
 const H = 420;
@@ -19,43 +17,61 @@ export default function SemiconductorDexterLab() {
   const tRef = useRef(0);
   const navigate = useNavigate();
 
-  /* CONTROLS */
+  /* ===== CONTROLS ===== */
   const [frequency, setFrequency] = useState(1.0);
   const [amount, setAmount] = useState(1.0);
   const [material, setMaterial] = useState("Silicon");
 
+  // 0 = frequency, 1 = amount
+  const [activeSlider, setActiveSlider] = useState(0);
+
   const Eg = MATERIALS[material].Eg;
 
-  /* PHYSICS */
+  /* ===== PHYSICS ===== */
   const emission = frequency >= Eg;
   const excessEnergy = Math.max(0, frequency - Eg);
   const electronCount = emission
     ? Math.min(8, Math.floor(excessEnergy * 6) + 1)
     : 0;
 
+  /* ================= KEYBOARD CONTROLS ================= */
+  useEffect(() => {
+    function onKey(e) {
+      if (["q", "Q", "e", "E"].includes(e.key)) {
+        setActiveSlider((s) => (s + 1) % 2);
+      }
+
+      if (e.key === "a" || e.key === "A") adjust(-1);
+      if (e.key === "d" || e.key === "D") adjust(+1);
+    }
+
+    function adjust(dir) {
+      if (activeSlider === 0) {
+        setFrequency((v) =>
+          Math.min(3, Math.max(0.2, +(v + dir * 0.02).toFixed(2)))
+        );
+      } else {
+        setAmount((v) =>
+          Math.min(2, Math.max(1, +(v + dir * 0.02).toFixed(2)))
+        );
+      }
+    }
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [activeSlider]);
+
+  /* ================= CANVAS ================= */
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const blockTop = 260;
 
-    /* ---------- BLACK CLEAR (CRITICAL FIX) ---------- */
     function clear() {
-      ctx.fillStyle = "#000";           // ← opaque black
+      ctx.fillStyle = "#000";
       ctx.fillRect(0, 0, W, H);
     }
 
-    /* ---------- GRID (NOW INVISIBLE ON BLACK) ---------- */
-    function grid() {
-      ctx.strokeStyle = "#111"; // black-on-black → invisible
-      for (let i = 0; i < W; i += 40) {
-        ctx.beginPath();
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, H);
-        ctx.stroke();
-      }
-    }
-
-    /* ---------- PHOTON WAVES ---------- */
     function drawPhotonWaves() {
       const color = emission ? "#ffd700" : "#666";
       ctx.strokeStyle = color;
@@ -84,11 +100,9 @@ export default function SemiconductorDexterLab() {
       ctx.shadowBlur = 0;
     }
 
-    /* ---------- SEMICONDUCTOR ---------- */
     function drawSemiconductor() {
       ctx.fillStyle = "#222";
       ctx.fillRect(260, blockTop, 320, 70);
-
       ctx.strokeStyle = "#0f0";
       ctx.strokeRect(260, blockTop, 320, 70);
 
@@ -106,73 +120,50 @@ export default function SemiconductorDexterLab() {
       }
     }
 
-    /* ---------- EMITTED ELECTRONS ---------- */
-     function drawEmittedElectrons() {
-  if (!emission || electronCount === 0) return;
+    function drawEmittedElectrons() {
+      if (!emission || electronCount === 0) return;
 
-  const speed = 0.45;
-  const maxTravel = 320;
-  const dotSpacing = 24;
+      const speed = 0.45;
+      const maxTravel = 320;
+      const dotSpacing = 24;
+      const baseAngle = -Math.PI / 4;
 
-  const baseAngle = -Math.PI / 4;
-  const ux = Math.cos(baseAngle);
-  const uy = Math.sin(baseAngle);
+      const ux = Math.cos(baseAngle);
+      const uy = Math.sin(baseAngle);
 
-  const baseOriginX = 300;
-  const originY = blockTop;
-  const surfaceSpacing = 24;
-  const dotsPerStream = 14;
+      const baseOriginX = 300;
+      const originY = blockTop;
+      const surfaceSpacing = 24;
 
-  for (let stream = 0; stream < electronCount; stream++) {
-    const originX = baseOriginX + stream * surfaceSpacing;
+      for (let stream = 0; stream < electronCount; stream++) {
+        const originX = baseOriginX + stream * surfaceSpacing;
 
-    for (let j = 0; j < dotsPerStream; j++) {
-      const s =
-        (tRef.current * speed - j * dotSpacing - stream * 55) %
-        maxTravel;
+        for (let j = 0; j < 14; j++) {
+          const s =
+            (tRef.current * speed - j * dotSpacing - stream * 55) %
+            maxTravel;
+          if (s < 0) continue;
 
-      if (s < 0) continue;
+          let bx = originX + ux * s;
+          let by = originY + uy * s;
 
-      /* --------- BALLISTIC BASE --------- */
-      let bx = originX + ux * s;
-      let by = originY + uy * s;
+          const noiseT = tRef.current * 0.02 + j * 10 + stream * 100;
+          bx += Math.sin(noiseT) * 4;
+          by += Math.cos(noiseT) * 6;
 
-      /* --------- BROWNIAN JITTER --------- */
-      const noiseT = tRef.current * 0.02 + j * 10 + stream * 100;
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = "#ff8866";
+          ctx.fillStyle = "#ff6644";
 
-      const jitterX =
-        (Math.sin(noiseT * 2.3) + Math.sin(noiseT * 0.7)) * 4;
-      const jitterY =
-        (Math.cos(noiseT * 1.9) + Math.sin(noiseT * 1.1)) * 6;
+          ctx.beginPath();
+          ctx.arc(bx, by, 3.1, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
 
-      bx += jitterX;
-      by += jitterY;
-
-      /* --------- ANGULAR DIFFUSION --------- */
-      const angularDrift =
-        Math.sin(noiseT * 0.6) * 0.15 * (s / maxTravel);
-
-      bx += Math.cos(baseAngle + Math.PI / 2) * angularDrift * 25;
-      by += Math.sin(baseAngle + Math.PI / 2) * angularDrift * 25;
-
-      if (bx < -40 || by < -40 || bx > W + 40 || by > H + 40) continue;
-
-      /* --------- DRAW ELECTRON --------- */
-      ctx.shadowBlur = 8;
-      ctx.shadowColor = "#ff8866";
-      ctx.fillStyle = "#ff6644";
-
-      ctx.beginPath();
-      ctx.arc(bx, by, 3.1, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.shadowBlur = 0;
     }
-  }
 
-  ctx.shadowBlur = 0;
-}
-
-
-    /* ---------- TEXT ---------- */
     function drawText() {
       ctx.fillStyle = "#fff";
       ctx.font = "14px monospace";
@@ -189,8 +180,7 @@ export default function SemiconductorDexterLab() {
     }
 
     function loop() {
-      clear();                 // ← BLACK BACKGROUND EVERY FRAME
-      grid();
+      clear();
       drawPhotonWaves();
       drawSemiconductor();
       drawSurfaceElectrons();
@@ -204,6 +194,7 @@ export default function SemiconductorDexterLab() {
     loop();
   }, [frequency, amount, material, Eg, emission, electronCount]);
 
+  /* ================= UI ================= */
   return (
     <div className="dexter-root">
       <div className="control-panel">
@@ -218,39 +209,45 @@ export default function SemiconductorDexterLab() {
             {m}
           </button>
         ))}
-        <button
-  className="experiment-card"
-  onClick={() => navigate("/PN")}
->
- 
-  <p>Photoelectric emission in semiconductors</p>
-</button>
-<button
-  className="experiment-card"
-  onClick={() => navigate("/PNJN")}
->
- 
-  <p>PN junction forwaard and reverse bia</p>
-</button>
 
+        <button onClick={() => navigate("/PN")}>
+          Photoelectric emission
+        </button>
+
+        <button onClick={() => navigate("/PNJN")}>
+          PN junction bias
+        </button>
 
         <button style={{ marginTop: 20 }} onClick={() => navigate("/")}>
           ⬅ BACK TO CONSOLE
         </button>
       </div>
 
-      <canvas
-        ref={canvasRef}
-        width={W}
-        height={H}
-        style={{ background: "#000" }}
-      />
+      <canvas ref={canvasRef} width={W} height={H} />
 
+      {/* ===== ENERGY PANEL ===== */}
       <div className="energy-panel">
+        {/* PRIMARY SELECTOR */}
+        <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+          <button
+            className={activeSlider === 0 ? "active" : ""}
+            onClick={() => setActiveSlider(0)}
+          >
+            FREQUENCY
+          </button>
+
+          <button
+            className={activeSlider === 1 ? "active" : ""}
+            onClick={() => setActiveSlider(1)}
+          >
+            INTENSITY
+          </button>
+        </div>
+
         <div className="energy-label">LIGHT FREQUENCY</div>
         <div className="energy-value">{frequency.toFixed(2)} eV</div>
         <input
-          className="energy-slider"
+          className={`energy-slider ${activeSlider === 0 ? "active" : ""}`}
           type="range"
           min="0.2"
           max="3"
@@ -262,7 +259,7 @@ export default function SemiconductorDexterLab() {
         <div className="energy-label">LIGHT AMOUNT</div>
         <div className="energy-value">{amount.toFixed(2)}×</div>
         <input
-          className="energy-slider em"
+          className={`energy-slider ${activeSlider === 1 ? "active" : ""}`}
           type="range"
           min="1"
           max="2"
@@ -270,10 +267,11 @@ export default function SemiconductorDexterLab() {
           value={amount}
           onChange={(e) => setAmount(+e.target.value)}
         />
-      </div>
- 
 
+        <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6 }}>
+          Select → <b>Q / E</b> | Adjust → <b>A / D</b>
+        </div>
+      </div>
     </div>
   );
 }
-

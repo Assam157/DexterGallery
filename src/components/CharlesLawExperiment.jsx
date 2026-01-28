@@ -236,7 +236,7 @@ export default function GasLawExperiment() {
           className={`slider-btn ${activeSlider === 0 ? "active" : ""}`}
           onClick={() => setActiveSlider(0)}
         >
-          Gas Temperature
+          Piston Load
         </button>
 
         <div className="slider-wrap">
@@ -272,7 +272,7 @@ export default function GasLawExperiment() {
           className={`slider-btn ${activeSlider === 1 ? "active" : ""}`}
           onClick={() => setActiveSlider(1)}
         >
-          Piston Load
+          Gas Tempareture
         </button>
 
         <div className="slider-wrap">
