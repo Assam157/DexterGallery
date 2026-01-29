@@ -8,6 +8,7 @@ import {
 
 import RadiationPhysicsLab from "./components/RaadiationPhysicsLab";
 import OpticalDexterLab from "./components/OpticalLab";
+import AstronomyLab from "./components/AStronomyLab";
 import SemiconductorDexterLab from "./components/SemiconducterLab";
 import EMLab from "./components/EMLab";
 import DigitalGateLab from "./components/DigitalGateLogic";
@@ -88,6 +89,9 @@ function DexterHome() {
       case "7":
         navigate("/quantum");
         break;
+      case "8":
+        navigate("/astronomy");
+        break;
       default:
         break;
     }
@@ -166,7 +170,9 @@ function DexterHome() {
       <button className="lab-btn" onClick={() => navigate("/semiconductor")}>
         🔌 Semiconductor Lab
       </button>
-
+       <button className="lab-btn" onClick={() => navigate("/astronomy")}>
+         🚀 Astronomy Lab
+      </button>
       <button className="lab-btn" onClick={() => navigate("/em")}>
         🧲 Electromagnetism Lab
       </button>
@@ -203,6 +209,7 @@ export default function App() {
         <Route path="/quantum" element={<QuantumSideLab/>} />
         <Route path="/chemistry" element={<ChemLab/>}/>
         <Route path="/PNJN" element={<DiodeBiasLab/>}/>
+        <Route path="/astronomy" element={<AstronomyLab/>}/>
  
               <Route
           path="PN"
