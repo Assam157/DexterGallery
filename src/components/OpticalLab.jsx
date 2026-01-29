@@ -537,10 +537,10 @@ function changeIncidentMedium(newIncident) {
     // ========= REFRACTION =========
     if (experiment === "refraction") {
       if (e.key === "a" || e.key === "A") {
-        setAngle(v => Math.max(5, v - 1));
+        setAngle(v => Math.round(Math.max(5, v - 0.1)*10)/10);
       }
       if (e.key === "d" || e.key === "D") {
-        setAngle(v => Math.min(75, v + 1));
+        setAngle(v => Math.round(Math.min(75, v + 0.1)*10)/10);
       }
       return;
     }
@@ -719,8 +719,14 @@ function changeIncidentMedium(newIncident) {
                 type="range"
                 min="5"
                 max="75"
+                step="0.1"
                 value={angle}
-                onChange={(e) => setAngle(+e.target.value)}
+                 onChange={(e) =>
+  setAngle(
+    Math.round(Math.abs(+e.target.value) * 10) / 10
+  )
+}
+
               />
             </div>
           </>

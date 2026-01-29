@@ -1,0 +1,25 @@
+.pulsar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Crop container */
+.video-crop {
+  width: 700px;        /* match canvas width */
+  height: 85%;         /* 👈 show only 85% */
+  max-height: 280px;   /* optional safety */
+  overflow: hidden;
+}
+
+/* Actual video */
+.pulsar-video {
+  width: 100%;
+  height: calc(100% / 0.85);  /* 👈 scale video so only 85% is visible */
+  object-fit: cover;
+  object-position: top;       /* keep top 85% */
+}
+
+.pulsar-canvas {
+  margin-top: 10px;
+}
