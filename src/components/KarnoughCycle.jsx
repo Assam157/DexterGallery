@@ -4,12 +4,14 @@ import "./Karnough.css";
 export default function CarnotPVExperiment() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-    const runningRef = useRef(false);
-const rafRef = useRef(null);
+
+  const runningRef = useRef(false);
+  const rafRef = useRef(null);
+  const pathRef = useRef([]); // 🔴 stores dot path
 
   /* ===== Diagram points ===== */
   const A = { x: 1.1, y: 4.1 };
-  const B = { x: 2.9, y: 3.1 };
+  const B = { x: 2.9, y: 4.1 };
   const C = { x: 3.1, y: 1.5 };
   const D = { x: 1.4, y: 2.0 };
 
@@ -23,8 +25,6 @@ const rafRef = useRef(null);
     if (!canvas || !video) return;
 
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
     const W = canvas.width;
     const H = canvas.height;
 
@@ -37,10 +37,7 @@ const rafRef = useRef(null);
       H - margin.b -
       ((p - Pmin) / (Pmax - Pmin)) * (H - margin.t - margin.b);
 
-    let animationId = null;
-    let running = false;
-
-    /* ===== Axes ===== */
+    /* ===== AXES ===== */
     function drawAxes() {
       ctx.strokeStyle = "#000";
       ctx.lineWidth = 2;
@@ -89,42 +86,7 @@ const rafRef = useRef(null);
       ctx.fillText("Carnot Cycle – P–V Diagram", W / 2 - 120, 25);
     }
 
-    /* ===== Carnot structure ===== */
-    function drawCarnotStructure() {
-      ctx.strokeStyle = "#c4002f";
-      ctx.lineWidth = 3;
-
-      ctx.beginPath();
-      ctx.moveTo(mapX(A.x), mapY(A.y));
-
-      // A → B (INWARD)
-      ctx.quadraticCurveTo(
-        mapX(2.0), mapY(3.0),
-        mapX(B.x), mapY(B.y)
-      );
-
-      // B → C (INWARD)
-      ctx.quadraticCurveTo(
-        mapX(2.3), mapY(2.2),
-        mapX(C.x), mapY(C.y)
-      );
-
-      // C → D (OUTWARD)
-      ctx.quadraticCurveTo(
-        mapX(3.5), mapY(1.0),
-        mapX(D.x), mapY(D.y)
-      );
-
-      // D → A (OUTWARD)
-      ctx.quadraticCurveTo(
-        mapX(0.7), mapY(4.2),
-        mapX(A.x), mapY(A.y)
-      );
-
-      ctx.stroke();
-    }
-
-    /* ===== Points ===== */
+    /* ===== POINT LABELS ===== */
     function drawPoints() {
       ctx.fillStyle = "#ffd400";
       ctx.strokeStyle = "#c4002f";
@@ -132,10 +94,10 @@ const rafRef = useRef(null);
       ctx.font = "14px Arial";
 
       [
-        { p: A, t: "A (P₁,V₁)" },
-        { p: B, t: "B (P₂,V₂)" },
-        { p: C, t: "C (P₃,V₃)" },
-        { p: D, t: "D (P₄,V₄)" }
+        { p: A, t: "A" },
+        { p: B, t: "B" },
+        { p: C, t: "C" },
+        { p: D, t: "D" }
       ].forEach(o => {
         const x = mapX(o.p.x);
         const y = mapY(o.p.y);
@@ -147,86 +109,106 @@ const rafRef = useRef(null);
       });
     }
 
-    /* ===== Bezier helper ===== */
+    /* ===== PROPER QUADRATIC BEZIER ===== */
     function quadBezier(p0, p1, p2, t) {
+      const u = 1 - t;
       return {
-        x:
-          (1 - t) * (1 - t) * p0.x +
-          2 * (1 - t) * t * p1.x +
-          t * t * p2.x,
-        y:
-          (1 - t) * (1 - t) * p0.y +
-          2 * (1 - t) * t * p1.y +
-          t * t * p2.y
+        x: u * u * p0.x + 2 * u * t * p1.x + t * t * p2.x,
+        y: u * u * p0.y + 2 * u * t * p1.y + t * t * p2.y
       };
     }
+
+    /* ===== SEGMENTS (USED BY DOT) ===== */
+    const curves = [
+      { p0: A, p1: { x: 1.75, y: 3.55 }, p2: B }, // A → B
+      { p0: B, p1: { x: 2.25, y: 2.55 }, p2: C }, // B → C
+      {
+  p0: C,
+  p1: { x: 2.25, y: 2.25 },  // inward, stable
+  p2: D
+}
+, // C → D
+      { p0: D, p1: { x: 1.85, y: 2.75 }, p2: A }  // D → A
+    ];
 
     let phase = 0;
     let t = 0;
 
     function drawMovingDot() {
-  let p;
+      const { p0, p1, p2 } = curves[phase];
+      const p = quadBezier(p0, p1, p2, t);
 
-  if (phase === 0)
-    p = quadBezier(A, { x: 2.0, y: 3.0 }, B, t);
-  else if (phase === 1)
-    p = quadBezier(B, { x: 2.3, y: 2.2 }, C, t);
-  else if (phase === 2)
-    p = quadBezier(C, { x: 3.5, y: 1.0 }, D, t);
-  else
-    p = quadBezier(D, { x: 0.7, y: 4.2 }, A, t);
+      const x = mapX(p.x);
+      const y = mapY(p.y);
 
-  ctx.fillStyle = "#d60000";
-  ctx.beginPath();
-  ctx.arc(mapX(p.x), mapY(p.y), 6, 0, Math.PI * 2);
-  ctx.fill();
+      /* ===== SAVE PATH ===== */
+      pathRef.current.push({ x, y });
 
-  // ⛔ advance ONLY if video is playing
-  if (!runningRef.current) return;
+      /* ===== DRAW PATH ===== */
+      ctx.strokeStyle = "#c4002f";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      pathRef.current.forEach((pt, i) => {
+        if (i === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      });
+      ctx.stroke();
 
-  t += 0.01;
-  if (t >= 1) {
-    t = 0;
-    phase = (phase + 1) % 4;
-  }
-}
+      /* ===== LABEL ===== */
+      ctx.fillStyle = "#c4002f";
+      ctx.font = "14px Arial";
+      ctx.fillText("Carnot Cycle Path", mapX(2.15), mapY(3.9));
 
+      /* ===== DRAW DOT ===== */
+      ctx.fillStyle = "#d60000";
+      ctx.beginPath();
+      ctx.arc(x, y, 6, 0, Math.PI * 2);
+      ctx.fill();
 
-     function animate() {
-  if (!runningRef.current) return;
+      if (!runningRef.current) return;
 
-  ctx.clearRect(0, 0, W, H);
-  drawAxes();
-  drawCarnotStructure();
-  drawPoints();
-  drawMovingDot();   // dot moves ONLY if runningRef is true
+      t += 0.01;
+      if (t >= 1) {
+        t = 0;
+        phase = (phase + 1) % curves.length;
+      }
+    }
 
-  rafRef.current = requestAnimationFrame(animate);
-}
+    function animate() {
+      if (!runningRef.current) return;
 
+      ctx.clearRect(0, 0, W, H);
+      drawAxes();
+      drawPoints();
+      drawMovingDot();
 
-   const start = () => {
-  if (runningRef.current) return;
-  runningRef.current = true;
-  animate();
-};
+      rafRef.current = requestAnimationFrame(animate);
+    }
 
-const stop = () => {
-  runningRef.current = false;
-  if (rafRef.current) {
-    cancelAnimationFrame(rafRef.current);
-    rafRef.current = null;
-  }
-};
+    const start = () => {
+      if (runningRef.current) return;
+      runningRef.current = true;
+      pathRef.current = []; // 🔥 reset trail
+      animate();
+    };
 
-video.addEventListener("play", start);
-video.addEventListener("pause", stop);
-video.addEventListener("ended", stop);
+    const stop = () => {
+      runningRef.current = false;
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+
+    video.addEventListener("play", start);
+    video.addEventListener("pause", stop);
+    video.addEventListener("ended", stop);
 
     return () => {
       stop();
       video.removeEventListener("play", start);
       video.removeEventListener("pause", stop);
+      video.removeEventListener("ended", stop);
     };
   }, []);
 

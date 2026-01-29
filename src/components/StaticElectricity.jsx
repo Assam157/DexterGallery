@@ -44,7 +44,7 @@ export default function StaticElectricityLab() {
       ctx.fillStyle = "#f5cbaa";
       ctx.fillRect(520 + offset, 230, 100, 60);
       ctx.fillRect(600 + offset, 250, 40, 15);
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = "black";
       ctx.fillText("Hand", 560 + offset, 220);
     }
 
@@ -53,7 +53,7 @@ export default function StaticElectricityLab() {
       ctx.ellipse(BALLOON.x, BALLOON.y, 60, 80, 0, 0, Math.PI * 2);
       ctx.fillStyle = "#60a5fa";
       ctx.fill();
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = "black";
       ctx.fillText("Balloon", BALLOON.x - 25, BALLOON.y + 110);
     }
 

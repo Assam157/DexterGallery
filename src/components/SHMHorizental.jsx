@@ -168,7 +168,7 @@ export default function HorizontalSpringWithFriction() {
         <div style={{ margin: "10px 0" }}>
           {btn("A", "Amplitude")}
           {btn("omega", "ω₀")}
-          {btn("gamma", "γ")}
+          {btn("gamma", "γ (Friction)")}
           {btn("phase", "Phase")}
         </div>
 

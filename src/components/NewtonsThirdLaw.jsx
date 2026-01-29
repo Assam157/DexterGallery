@@ -49,7 +49,7 @@ export default function NewtonThirdLawLab() {
       ctx.fillStyle = "#334155";
       ctx.fillRect(gun.x, GUN_Y, 140, 40);
       ctx.fillRect(gun.x + BARREL_OFFSET, GUN_Y - 10, 50, 20);
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = "black";
       ctx.fillText("Gun", gun.x + 50, GUN_Y - 15);
     }
 
@@ -65,7 +65,7 @@ export default function NewtonThirdLawLab() {
       ctx.arc(bullet.x, bullet.y, 6, 0, Math.PI * 2);
       ctx.fillStyle = "#facc15";
       ctx.fill();
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = "black";
       ctx.fillText("Bullet", bullet.x - 15, bullet.y - 15);
     }
 
@@ -78,7 +78,7 @@ export default function NewtonThirdLawLab() {
     }
 
     function drawText() {
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = "black";
       ctx.fillText("Action: Gun pushes bullet forward", 20, 40);
       ctx.fillText("Reaction: Bullet pushes gun backward", 20, 65);
       ctx.fillText(

@@ -34,6 +34,10 @@ export default function MomentumConservationLab() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
+    const CART_W = 50;
+    const CART_H = 30;
+    const WALL_X = 790;
+
     let cart1 = { x: 100, v: vA, m: 2 };
     let cart2 = { x: 500, v: 0, m: 2 };
 
@@ -46,8 +50,8 @@ export default function MomentumConservationLab() {
         cart1.x += cart1.v;
         cart2.x += cart2.v;
 
-        // Elastic collision
-        if (cart1.x + 50 >= cart2.x) {
+        /* Elastic collision between carts */
+        if (cart1.x + CART_W >= cart2.x) {
           const v1 =
             ((cart1.m - cart2.m) / (cart1.m + cart2.m)) * cart1.v;
           const v2 =
@@ -56,21 +60,33 @@ export default function MomentumConservationLab() {
           cart1.v = v1;
           cart2.v = v2;
         }
+
+        /* Cart B crashes into wall */
+        if (cart2.x + CART_W >= WALL_X) {
+          cart2.x = WALL_X - CART_W;
+          cart2.v = 0;
+        }
       }
+
+      /* Wall */
+      ctx.fillStyle = "#94a3b8";
+      ctx.fillRect(WALL_X, 250, 10, 150);
+      ctx.fillStyle = "black";
+      ctx.fillText("WALL", WALL_X - 15, 240);
 
       /* Cart A */
       ctx.fillStyle = "#22c55e";
-      ctx.fillRect(cart1.x, 300, 50, 30);
-      ctx.fillStyle = "#fff";
+      ctx.fillRect(cart1.x, 300, CART_W, CART_H);
+      ctx.fillStyle = "black";
       ctx.fillText("Cart A", cart1.x, 290);
-      ctx.fillText(`v = ${cart1.v.toFixed(1)}`, cart1.x, 340);
+      ctx.fillText(`v = ${cart1.v.toFixed(1)}`, cart1.x, 345);
 
       /* Cart B */
       ctx.fillStyle = "#f97316";
-      ctx.fillRect(cart2.x, 300, 50, 30);
-      ctx.fillStyle = "#fff";
+      ctx.fillRect(cart2.x, 300, CART_W, CART_H);
+      ctx.fillStyle = "black";
       ctx.fillText("Cart B", cart2.x, 290);
-      ctx.fillText(`v = ${cart2.v.toFixed(1)}`, cart2.x, 340);
+      ctx.fillText(`v = ${cart2.v.toFixed(1)}`, cart2.x, 345);
 
       animationId = requestAnimationFrame(draw);
     }
@@ -93,20 +109,18 @@ export default function MomentumConservationLab() {
   );
 
   return (
-    <div style={{ color: "#fff" }}>
-      <h2>🚀 Conservation of Momentum</h2>
+    <div style={{ color: "#fff", background: "#020617", padding: 12 }}>
+      <h2>🚀 Conservation of Momentum (Wall Crash)</h2>
 
-      {/* Primary control selector */}
       <div style={{ marginBottom: 10 }}>
         {btn("sim", "Simulation")}
         {btn("velocity", "Cart A Velocity")}
       </div>
 
       <p>
-        Active: <b>{active.toUpperCase()}</b> — use <b>A / D</b>
+        Active Mode: <b>{active.toUpperCase()}</b> — use <b>A / D</b>
       </p>
 
-      {/* Mouse controls */}
       <button onClick={() => setRunning(true)}>Start</button>
       <button onClick={() => setRunning(false)}>Pause</button>
       <button
