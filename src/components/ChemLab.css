@@ -1,27 +1,38 @@
- /* ===============================
-   GLOBAL MOBILE SAFETY
+/* ===============================
+   GLOBAL MOBILE SAFETY (ROOT SCROLLER)
    =============================== */
 
-html, body {
+html,
+body {
   width: 100%;
-  height: 100%;
-  overflow-y: auto;                 /* allow vertical scroll */
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-}
-/* ================= GLOBAL LAB BACKGROUND ================= */
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
 
-.lab-root {
-  width: 100vw;
-  height: 100vh;
-  background: #e5e7eb; /* 🔘 light grey */
-  display: flex;
-  overflow: hidden;
+  overflow-y: auto;              /* ✅ main scroll */
+  overflow-x: hidden;
+
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 /* ===============================
-   CHEM LAB PANEL — MOBILE SAFE
+   GLOBAL LAB BACKGROUND
+   =============================== */
+
+.lab-root {
+  width: 100%;
+  min-height: 100vh;             /* ✅ grow naturally */
+  background: #e5e7eb;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: visible;             /* ❌ DO NOT lock */
+}
+
+/* ===============================
+   CHEM LAB PANEL — FULL SCROLL
    =============================== */
 
 .chem-lab,
@@ -30,17 +41,22 @@ html, body {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+
+  overflow: visible;             /* 🔑 allow content flow */
 }
 
-/* Make entire lab scrollable on mobile */
+/* ===============================
+   MOBILE OVERRIDES
+   =============================== */
+
 @media (max-width: 768px) {
   .chem-lab,
   .lab-panel {
+    min-height: auto;            /* ❌ remove vh traps */
     height: auto;
-    min-height: 100vh;
-    overflow-y: auto;               /* 🔑 scroll */
-    overflow-x: hidden;
-    padding-bottom: 24px;
+
+    overflow: visible;           /* 🔑 body handles scroll */
+    padding-bottom: 40px;
   }
 }
 
@@ -62,7 +78,7 @@ html, body {
 
 .panel-btn {
   width: 100%;
-  padding: 14px 16px;               /* 👆 finger sized */
+  padding: 14px 16px;
   margin-bottom: 10px;
   border-radius: 12px;
   font-size: 15px;
@@ -80,11 +96,10 @@ html, body {
 select,
 input,
 button {
-  font-size: 16px;                  /* 🔑 prevents iOS zoom */
+  font-size: 16px;               /* ✅ prevents iOS zoom */
   touch-action: manipulation;
 }
 
-/* Dropdowns */
 select {
   width: 100%;
   padding: 12px;
@@ -95,18 +110,31 @@ select {
   border-radius: 10px;
 }
 
-/* Sliders */
 input[type="range"] {
   width: 100%;
   margin-top: 10px;
 }
 
 /* ===============================
-   SCROLLABLE SUB-PANELS (if any)
+   OPTIONAL INTERNAL SCROLL AREAS
    =============================== */
 
 .lab-scroll-area {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  max-height: 70vh;                 /* avoids overflow trap */
+  max-height: none;              /* ❌ remove clamp */
+  overflow: visible;             /* 🔑 no scroll nesting */
+}
+
+/* ===============================
+   RIPPLE ANIMATION
+   =============================== */
+
+@keyframes ripple {
+  0% {
+    transform: translateX(-50%) scale(0.3);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(-50%) scale(2.4);
+    opacity: 0;
+  }
 }
