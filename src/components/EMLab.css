@@ -1,5 +1,5 @@
 /* ======================================================
-   GLOBAL LOCK (RELAXED FOR MOBILE)
+   GLOBAL LOCK
    ====================================================== */
 *,
 *::before,
@@ -12,12 +12,10 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
-  min-height: 100%;
-  overflow-x: hidden;      /* ❌ no horizontal scroll */
-  overflow-y: auto;        /* ✅ vertical scroll allowed */
+  height: 100%;
+  overflow: hidden; /* 🔒 ABSOLUTE */
   background: #0b0b63;
   font-family: system-ui, monospace;
-  -webkit-overflow-scrolling: touch; /* 📱 smooth mobile scroll */
 }
 
 /* ======================================================
@@ -27,15 +25,12 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-height: 100vh;   /* ✅ allow page to grow */
+  height: 100vh;
   background: #1a614d;
 }
 
 /* ======================================================
    TOP PANEL (BUTTON BAR)
-   ====================================================== */
- /* ======================================================
-   TOP PANEL (SCROLLABLE)
    ====================================================== */
 .lab-top-panel {
   display: flex;
@@ -46,22 +41,7 @@ body {
   border-bottom: 1px solid rgba(120, 200, 255, 0.15);
 
   flex-shrink: 0;
-
-  overflow-x: auto;           /* ✅ horizontal scroll */
-  overflow-y: hidden;
-  white-space: nowrap;        /* ✅ keep buttons in one row */
-  -webkit-overflow-scrolling: touch; /* 📱 smooth swipe */
 }
-
-/* Hide scrollbar (clean UI) */
-.lab-top-panel::-webkit-scrollbar {
-  height: 0;
-}
-
-.lab-top-panel {
-  scrollbar-width: none; /* Firefox */
-}
-
 
 /* ======================================================
    BUTTONS
@@ -88,7 +68,7 @@ body {
 }
 
 /* ======================================================
-   FULL CANVAS AREA (SCROLL-FRIENDLY)
+   FULL CANVAS AREA
    ====================================================== */
 .lab-canvas-full {
   flex: 1;
@@ -98,16 +78,14 @@ body {
   justify-content: center;
 
   background: #851f1f;
-
-  min-height: 60vh;     /* ✅ ensures canvas is visible */
-  overflow: visible;   /* ✅ allow full canvas visibility */
+  overflow: hidden;
 }
 
 .lab-canvas-full canvas {
   width: 100%;
-  height: auto;        /* ✅ keeps aspect ratio */
+  height: 100%;
   max-width: 100%;
-  max-height: none;
+  max-height: 100%;
 
   background: #000;
 }
@@ -116,7 +94,7 @@ body {
    BOTTOM PANEL (SLIDERS ONLY)
    ====================================================== */
 .lab-bottom-panel {
-  min-height: 110px;
+  height: 110px;
   padding: 16px 22px;
 
   background: linear-gradient(#060b18, #02040a);
@@ -126,7 +104,6 @@ body {
   align-items: center;
   gap: 28px;
 
-  flex-wrap: wrap;     /* ✅ wrap sliders on small screens */
   flex-shrink: 0;
 }
 
@@ -136,23 +113,3 @@ body {
 .lab-bottom-panel input[type="range"] {
   width: 220px;
 }
-
-/* ======================================================
-   MOBILE OPTIMIZATION
-   ====================================================== */
-@media (max-width: 768px) {
-  .lab-canvas-full {
-    min-height: 70vh;
-  }
-
-  .lab-bottom-panel {
-    justify-content: center;
-    gap: 16px;
-  }
-
-  .lab-bottom-panel input[type="range"] {
-    width: 100%;
-    max-width: 320px;
-  }
-}
-

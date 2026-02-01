@@ -1,190 +1,248 @@
 import React, { useRef, useEffect, useState } from "react";
+import "./SidebarPhysicsLab.css"
 
-export default function VerticalSpringSHM() {
+/* ===============================
+   Canvas size
+   =============================== */
+const W = 900;
+const H = 520;
+
+/* ===============================
+   Liquids (fixed)
+   =============================== */
+const LIQUIDS = [
+  { name: "Water", density: 1.0, color: "rgba(59,130,246,0.45)" },
+  { name: "Oil", density: 0.8, color: "rgba(250,204,21,0.45)" },
+  { name: "Mercury", density: 13.6, color: "rgba(148,163,184,0.6)" }
+];
+
+/* ===============================
+   Materials (fixed)
+   =============================== */
+const MATERIALS = [
+  { name: "Wood", density: 0.6, color: [146, 64, 14] },
+  { name: "Ice", density: 0.92, color: [103, 232, 249] },
+  { name: "Aluminum", density: 2.7, color: [156, 163, 175] },
+  { name: "Iron", density: 7.8, color: [75, 85, 99] }
+];
+
+export default function BuoyancyLab() {
+  /* ===============================
+     Refs
+     =============================== */
   const canvasRef = useRef(null);
-  const graphRef = useRef(null);
   const rafRef = useRef(null);
 
-  /* ===== Controls ===== */
-  const [A, setA] = useState(60);
-  const [omega, setOmega] = useState(2);
-  const [phase, setPhase] = useState(0);
-  const [gravity, setGravity] = useState(9.8);
-  const [running, setRunning] = useState(true);
+  const materialIndexRef = useRef(0);
+  const materialBlendRef = useRef(0);
+  const liquidIndexRef = useRef(0);
 
-  const [active, setActive] = useState("A");
+  const submergeRef = useRef(0);
+  const timeRef = useRef(0);
 
-  const t0 = useRef(null);
-  const data = useRef([]);
+  /* ===============================
+     State (UI)
+     =============================== */
+  const [materialIndex, setMaterialIndex] = useState(0);
+  const [materialBlend, setMaterialBlend] = useState(0);
+  const [liquidIndex, setLiquidIndex] = useState(0);
 
-  /* ================= KEYBOARD CONTROL ================= */
+  /* ===============================
+     Sync state → refs
+     =============================== */
   useEffect(() => {
-    const handleKey = (e) => {
-      if (e.key !== "a" && e.key !== "d") return;
-      const dir = e.key === "d" ? 1 : -1;
+    materialIndexRef.current = materialIndex;
+  }, [materialIndex]);
 
-      if (active === "A")
-        setA(v => Math.min(120, Math.max(20, v + dir * 5)));
-
-      if (active === "omega")
-        setOmega(v => +(Math.min(5, Math.max(0.5, v + dir * 0.1))).toFixed(1));
-
-      if (active === "phase")
-        setPhase(v => +(v + dir * 0.2).toFixed(2));
-
-      if (active === "g")
-        setGravity(v =>
-          +(Math.min(20, Math.max(0, v + dir * 0.2))).toFixed(1)
-        );
-    };
-
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [active]);
-
-  /* ================= ANIMATION ================= */
   useEffect(() => {
-    const ctx = canvasRef.current.getContext("2d");
-    const gctx = graphRef.current.getContext("2d");
+    materialBlendRef.current = materialBlend;
+  }, [materialBlend]);
 
-    const W = canvasRef.current.width;
-    const H = canvasRef.current.height;
+  useEffect(() => {
+    liquidIndexRef.current = liquidIndex;
+  }, [liquidIndex]);
 
-    function drawSpring(x, y1, y2) {
-      const coils = 14;
-      const amp = 8;
-      const len = y2 - y1;
-      const step = len / coils;
+  /* ===============================
+     Animation loop (once)
+     =============================== */
+  useEffect(() => {
+    function animate() {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-      ctx.strokeStyle = "#aaa";
-      ctx.beginPath();
-      ctx.moveTo(x, y1);
-
-      for (let i = 1; i < coils; i++) {
-        const dx = i % 2 === 0 ? -amp : amp;
-        ctx.lineTo(x + dx, y1 + i * step);
-      }
-
-      ctx.lineTo(x, y2);
-      ctx.stroke();
-    }
-
-    function animate(time) {
-      if (!running) return;
-
-      if (!t0.current) t0.current = time;
-      const t = (time - t0.current) / 1000;
-
-      const yEq = gravity / (omega * omega);
-      const y = yEq + A * Math.cos(omega * t + phase);
-
-      ctx.clearRect(0, 0, W, H);
-
-      const topY = 20;
-      const eqY = H / 2;
-      const massY = eqY + y;
-
-      /* ceiling */
-      ctx.strokeStyle = "#666";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(W / 2 - 50, topY);
-      ctx.lineTo(W / 2 + 50, topY);
-      ctx.stroke();
-
-      /* spring */
-      drawSpring(W / 2, topY, massY - 15);
-
-      /* mass */
-      ctx.fillStyle = "#ff5555";
-      ctx.fillRect(W / 2 - 20, massY - 15, 40, 30);
-
-      /* equilibrium */
-      ctx.setLineDash([6, 6]);
-      ctx.strokeStyle = "#444";
-      ctx.beginPath();
-      ctx.moveTo(W / 2 - 70, eqY + yEq);
-      ctx.lineTo(W / 2 + 70, eqY + yEq);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      /* graph */
-      data.current.push(y);
-      if (data.current.length > 260) data.current.shift();
-
-      gctx.clearRect(0, 0, 320, 200);
-      gctx.strokeStyle = "#888";
-      gctx.beginPath();
-      gctx.moveTo(40, 10);
-      gctx.lineTo(40, 190);
-      gctx.lineTo(300, 190);
-      gctx.stroke();
-
-      gctx.strokeStyle = "#00aaff";
-      gctx.beginPath();
-      data.current.forEach((v, i) => {
-        const gx = 40 + i;
-        const gy = 100 - v * 0.6;
-        i === 0 ? gctx.moveTo(gx, gy) : gctx.lineTo(gx, gy);
-      });
-      gctx.stroke();
+      const ctx = canvas.getContext("2d");
+      draw(ctx);
 
       rafRef.current = requestAnimationFrame(animate);
     }
 
-    rafRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [A, omega, phase, gravity, running]);
+    animate();
 
-  const btn = (key, label) => (
-    <button
-      onClick={() => setActive(key)}
-      style={{
-        background: active === key ? "#00aaff" : "#222",
-        color: "#fff",
-        marginRight: 6
-      }}
-    >
-      {label}
-    </button>
-  );
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
 
+  /* ===============================
+     Draw
+     =============================== */
+  function draw(ctx) {
+    const tank = { x: 250, y: 80, w: 400, h: 320 };
+    const surfaceY = tank.y + 40;
+
+    timeRef.current += 0.04;
+
+    const material = MATERIALS[materialIndexRef.current];
+    const liquid = LIQUIDS[liquidIndexRef.current];
+    const blend = materialBlendRef.current;
+
+    /* Density + color interpolation */
+    const density =
+      material.density * (0.7 + blend * 0.6);
+
+    const color = material.color.map(c =>
+      Math.round(c * (0.8 + blend * 0.4))
+    );
+
+    /* Buoyancy */
+    const ratio = liquid.density / density;
+    const targetSubmerge =
+      ratio >= 1 ? 35 : Math.min(120, 120 / ratio);
+
+    submergeRef.current +=
+      (targetSubmerge - submergeRef.current) * 0.05;
+
+    const bob =
+      density < liquid.density
+        ? Math.sin(timeRef.current) * 3
+        : 0;
+
+    /* Background */
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "#020617";
+    ctx.fillRect(0, 0, W, H);
+
+    /* Tank */
+    ctx.strokeStyle = "#e5e7eb";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(tank.x, tank.y, tank.w, tank.h);
+
+    /* 🌊 Liquid with ripples */
+    ctx.fillStyle = liquid.color;
+    ctx.beginPath();
+    ctx.moveTo(tank.x, surfaceY);
+
+    for (let x = 0; x <= tank.w; x += 6) {
+      const wave =
+        Math.sin(x * 0.04 + timeRef.current * 2) * 4;
+      ctx.lineTo(tank.x + x, surfaceY + wave);
+    }
+
+    ctx.lineTo(tank.x + tank.w, tank.y + tank.h);
+    ctx.lineTo(tank.x, tank.y + tank.h);
+    ctx.closePath();
+    ctx.fill();
+
+    /* Block */
+    const blockW = 80;
+    const blockH = 80;
+    const blockX = tank.x + tank.w / 2 - blockW / 2;
+    const blockY =
+      surfaceY + submergeRef.current - blockH + bob;
+
+    ctx.fillStyle = `rgb(${color.join(",")})`;
+    ctx.fillRect(blockX, blockY, blockW, blockH);
+    ctx.strokeStyle = "#000";
+    ctx.strokeRect(blockX, blockY, blockW, blockH);
+
+    /* Labels */
+    ctx.fillStyle = "#fff";
+    ctx.font = "15px Arial";
+    ctx.fillText(
+      `${liquid.name} (ρ = ${liquid.density})`,
+      tank.x + 10,
+      tank.y + 25
+    );
+
+    ctx.fillText(
+      `${material.name} (ρ ≈ ${density.toFixed(2)})`,
+      blockX - 10,
+      blockY - 10
+    );
+
+    ctx.fillStyle = "#34d399";
+    ctx.fillText(
+      density < liquid.density
+        ? "Status: FLOATING"
+        : "Status: SINKING",
+      20,
+      40
+    );
+  }
+
+  /* ===============================
+     UI
+     =============================== */
   return (
-    <div style={{ display: "flex", gap: 20 }}>
-      <canvas ref={canvasRef} width={260} height={360} />
+    <div style={{ background: "#020617", padding: 16 }}>
+      <h2 style={{ color: "#38bdf8" }}>
+        🌊 Buoyancy — Physics Lab
+      </h2>
 
-      <div>
-        <canvas ref={graphRef} width={320} height={200} />
+      <canvas
+        ref={canvasRef}
+        width={W}
+        height={H}
+        style={{
+          border: "2px solid #334155",
+          borderRadius: 12,
+          display: "block",
+          marginBottom: 14
+        }}
+      />
 
-        <div style={{ margin: "10px 0" }}>
-          {btn("A", "Amplitude")}
-          {btn("omega", "ω")}
-          {btn("phase", "Phase")}
-          {btn("g", "Gravity")}
-        </div>
+      <div style={{ color: "white", maxWidth: 460 }}>
+        {/* Liquid */}
+        <label>Liquid</label>
+        <select
+          value={liquidIndex}
+          onChange={e => setLiquidIndex(+e.target.value)}
+        >
+          {LIQUIDS.map((l, i) => (
+            <option key={l.name} value={i}>
+              {l.name}
+            </option>
+          ))}
+        </select>
 
-        <p>
-          Active control: <b>{active.toUpperCase()}</b> (A / D)
-        </p>
+        {/* Material */}
+        <label style={{ marginTop: 10, display: "block" }}>
+          Material
+        </label>
+        <select
+          value={materialIndex}
+          onChange={e => setMaterialIndex(+e.target.value)}
+        >
+          {MATERIALS.map((m, i) => (
+            <option key={m.name} value={i}>
+              {m.name}
+            </option>
+          ))}
+        </select>
 
-        <input type="range" min="20" max="120" value={A}
-          onChange={e => setA(+e.target.value)} />
-
-        <input type="range" min="0.5" max="5" step="0.1" value={omega}
-          onChange={e => setOmega(+e.target.value)} />
-
-        <input type="range" min="-6.28" max="6.28" step="0.1" value={phase}
-          onChange={e => setPhase(+e.target.value)} />
-
-        <input type="range" min="0" max="20" step="0.2" value={gravity}
-          onChange={e => setGravity(+e.target.value)} />
-
-        <button onClick={() => {
-          t0.current = null;
-          setRunning(r => !r);
-        }}>
-          {running ? "Pause" : "Resume"}
-        </button>
+        {/* Slider */}
+        <label style={{ marginTop: 10, display: "block" }}>
+          Material Adjustment
+        </label>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={materialBlend}
+          onChange={e => setMaterialBlend(+e.target.value)}
+          style={{ width: "100%" }}
+        />
       </div>
     </div>
   );
