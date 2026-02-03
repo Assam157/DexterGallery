@@ -4,7 +4,7 @@ import React, { useRef, useEffect, useState } from "react";
    Bell Experiment — Local Hidden Variable (EMBED SAFE)
    ===================================================== */
 
-export default function BellLocalHiddenVariableLab() {
+export default function App() {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -42,11 +42,32 @@ export default function BellLocalHiddenVariableLab() {
     return () => window.removeEventListener("resize", resizeCanvas);
   }, []);
 
-  /* ===== Keyboard Control (A / D) ===== */
+  /* ===== Keyboard Control (Q / E + A / D) ===== */
   useEffect(() => {
+    const controls = ["phi", "lambda", "theta"];
+
     const handleKeyDown = (e) => {
-      if (!["a", "A", "d", "D"].includes(e.key)) return;
-      const delta = e.key.toLowerCase() === "a" ? -1 : 1;
+      // Q / E → select control
+      if (e.key === "q" || e.key === "Q") {
+        setActiveControl(c =>
+          controls[(controls.indexOf(c) - 1 + controls.length) % controls.length]
+        );
+        return;
+      }
+
+      if (e.key === "e" || e.key === "E") {
+        setActiveControl(c =>
+          controls[(controls.indexOf(c) + 1) % controls.length]
+        );
+        return;
+      }
+
+      // A / D → adjust
+      const delta =
+        e.key === "a" || e.key === "A" ? -1 :
+        e.key === "d" || e.key === "D" ? 1 : 0;
+
+      if (!delta) return;
 
       if (activeControl === "phi") {
         setPhi(v => Math.min(180, Math.max(0, v + delta)));
@@ -186,7 +207,7 @@ export default function BellLocalHiddenVariableLab() {
           color: "white"
         }}
       >
-        {/* Φ */}
+        {/* φ */}
         <div>
           <button
             onClick={() => setActiveControl("phi")}

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PolarisationExperiment from "./PolarizationExperiment";
+import ConcaveMirrorPhysicsLab from "./MirrorExperiment";
 import "./RadiationDexterLab.css";
 
 const W = 700;
@@ -533,6 +534,8 @@ function changeIncidentMedium(newIncident) {
   function onKey(e) {
     // ========= POLARIZATION HANDLED INSIDE ITS OWN COMPONENT =========
     if (experiment === "Polarization") return;
+    // =========  Mirror Handled in its own component=========
+    if (experiment === "Concave") return;
 
     // ========= REFRACTION =========
     if (experiment === "refraction") {
@@ -584,6 +587,12 @@ function changeIncidentMedium(newIncident) {
         onClick={() => setExperiment("Polarization")}
       >
         Polarization Experiment
+      </button>
+       <button
+        className={experiment === "Concave" ? "active" : ""}
+        onClick={() => setExperiment("Concave")}
+      >
+        Mirror Experiment
       </button>
 
       <button
@@ -670,7 +679,8 @@ function changeIncidentMedium(newIncident) {
         width={W}
         height={H}
         style={{
-          display: experiment === "Polarization" ? "none" : "block"
+          display: experiment === "Polarization" ? "none" : "block",
+          display: experiment === "Concave" ? "none":"block"
         }}
       />
 
@@ -682,6 +692,16 @@ function changeIncidentMedium(newIncident) {
           setLightOn={setLightOn}
         />
       )}
+      
+       {/* ===== MIRROR EXPERIMENT ===== */}
+      {experiment === "Concave" && (
+        <ConcaveMirrorPhysicsLab
+          key="concave"
+          lightOn={lightOn}
+          setLightOn={setLightOn}
+        />
+      )}
+
 
       {/* ===== ENERGY PANEL (NOW BELOW CANVAS) ===== */}
       <div className="energy-panel">
