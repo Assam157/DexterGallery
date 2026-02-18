@@ -1,5 +1,5 @@
- /* ===============================
-   Quantum Lab — ROOT
+/* ===============================
+   ROOT LAYOUT
    =============================== */
 
 .ql-root {
@@ -21,6 +21,7 @@
   border-right: 1px solid #1e293b;
   padding: 16px;
   background: #020617;
+  overflow-y: auto;
 }
 
 .ql-title {
@@ -36,8 +37,8 @@
 /* Experiment buttons */
 .ql-exp-btn {
   width: 100%;
-  padding: 12px 16px;
-  margin-bottom: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
   border-radius: 12px;
   background: #020617;
   border: 1px solid #334155;
@@ -72,6 +73,9 @@
   position: relative;
   background: #020617;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Overlay title */
@@ -86,6 +90,7 @@
   font-size: 14px;
   color: #facc15;
   pointer-events: none;
+  text-align: center;
 }
 
 /* ===============================
@@ -96,20 +101,22 @@
   border-left: 1px solid #1e293b;
   padding: 16px;
   background: #020617;
+  overflow-y: auto;
 }
 
 .ql-control-group {
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
 .ql-control-group label {
   display: block;
   font-size: 14px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .ql-control-group input[type="range"] {
   width: 100%;
+  touch-action: pan-x;
 }
 
 .ql-control-group span {
@@ -123,21 +130,22 @@
 
 .ql-info-box {
   margin-top: 12px;
-  padding: 10px 14px;
+  padding: 12px 14px;
   border-radius: 10px;
   border: 1px solid #334155;
   background: #020617;
   color: #60a5fa;
   font-size: 14px;
 }
+
 /* ===============================
    BACK BUTTON
    =============================== */
 
 .ql-back-btn {
   width: 100%;
-  padding: 10px 14px;
-  margin-bottom: 14px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
   border-radius: 10px;
   background: #020617;
   border: 1px solid #64748b;
@@ -153,6 +161,7 @@
   color: #ffffff;
   background: rgba(56, 189, 248, 0.08);
 }
+
 /* ===============================
    HIGGS BOSON EXPERIMENT
    =============================== */
@@ -166,7 +175,7 @@
 .higgs-wrapper canvas {
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, #0f172a, #020617);
+  max-width: 100%;
 }
 
 .higgs-status {
@@ -180,6 +189,7 @@
   font-size: 14px;
   color: #facc15;
   border: 1px solid #334155;
+  text-align: center;
 }
 
 /* ===============================
@@ -195,6 +205,77 @@
 }
 
 .accelerator-wrapper canvas {
-  background: radial-gradient(circle at center, #0f172a, #020617);
+  width: 100%;
+  height: auto;
+  max-height: 100%;
   border-radius: 20px;
+}
+
+/* ===============================
+   📱 MOBILE RESPONSIVE
+   =============================== */
+
+@media (max-width: 1024px) {
+  .ql-root {
+    grid-template-columns: 200px 1fr 260px;
+  }
+}
+
+@media (max-width: 900px) {
+  .ql-root {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .ql-sidebar {
+    border-right: none;
+    border-bottom: 1px solid #1e293b;
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px;
+  }
+
+  .ql-exp-btn {
+    display: inline-block;
+    width: auto;
+    margin-right: 10px;
+  }
+
+  .ql-center {
+    height: 50vh;
+  }
+
+  .ql-controls {
+    border-left: none;
+    border-top: 1px solid #1e293b;
+  }
+}
+
+@media (max-width: 600px) {
+  .ql-center {
+    height: 45vh;
+  }
+
+  .ql-title {
+    font-size: 16px;
+  }
+
+  .ql-exp-btn {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+
+  .ql-control-group label {
+    font-size: 13px;
+  }
+
+  .ql-info-box {
+    font-size: 13px;
+  }
+
+  .higgs-status {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
 }
