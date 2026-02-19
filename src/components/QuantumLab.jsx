@@ -7,6 +7,7 @@ import CHSHInequalityLab from "./CHSHinequlity.jsx";
 import QuantumShellLab from "./QuantumNoVisulization.jsx";
 import QuantumBosonHiggsPrticle from "./QuantumHiggsBoson";
 import QuantumParticleAccelerator from "./QuantumLabAccelarator";
+import LigoChirpSimulation from "./QuantumLabLIGOExperiment.jsx";
 
 import "./QuantumLab.css";
 
@@ -73,6 +74,13 @@ export default function QuantumSideLab() {
         >
           📐 CHSH Inequality
         </button>
+        <button
+        className={`ql-exp-btn ${activeExperiment === "ligo" ? "active" : ""}`}
+        onClick={() => setActiveExperiment("ligo")}
+        >
+        🌌 Gravitational Waves (LIGO)
+        </button>
+
 
         <button
           className={`ql-exp-btn ${activeExperiment === "no" ? "active" : ""}`}
@@ -119,6 +127,15 @@ export default function QuantumSideLab() {
             </div>
           </>
         )}
+        {activeExperiment === "ligo" && (
+  <>
+    <LigoChirpSimulation />
+    <div className="ql-overlay-title">
+      Gravitational Waves — LIGO Interferometer
+    </div>
+  </>
+)}
+
 
         {activeExperiment === "chsh" && (
           <>
@@ -218,6 +235,18 @@ export default function QuantumSideLab() {
             </button>
           </>
         )}
+        {activeExperiment === "ligo" && (
+  <>
+    <div className="ql-info-box">
+      Laser interferometer detecting spacetime strain
+      from black hole mergers.
+      <br />
+      Chirp signal increases in frequency & amplitude
+      before merger.
+    </div>
+  </>
+)}
+
 
         {/* ===== Higgs ===== */}
         {activeExperiment === "higgs" && (
