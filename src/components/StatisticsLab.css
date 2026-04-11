@@ -1,0 +1,66 @@
+.stats-lab-container { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: center; }
+.stats-card { max-width: 1200px; width: 100%; background: #1c3a4f; border-radius: 32px; box-shadow: 0 25px 40px rgba(0,0,0,0.7); overflow: hidden; border: 1px solid #7ab8d0; }
+.stats-header { background: #1b4f6e; padding: 20px 28px; border-bottom: 3px solid #f9c74f; }
+.stats-header h1 { margin: 0 0 16px 0; font-size: 1.8rem; color: #fff3d1; text-align: center; }
+.stats-tabs { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.stats-tab { background: rgba(10,48,64,0.8); border: none; padding: 10px 24px; border-radius: 40px; color: #b0d0ff; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 1rem; }
+.stats-tab.active { background: #f9c74f; color: #022b3b; box-shadow: 0 0 15px #ffb700; }
+.stats-tab:hover { transform: translateY(-2px); }
+.stats-content { padding: 24px; min-height: 500px; }
+.stats-module { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+.stats-canvas { width: 600px; height: 400px; background: #0b2a38; border-radius: 12px; border: 2px solid #3f9ec0; }
+.stats-controls { flex: 1; min-width: 280px; background: #0e3a4c; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.data-input { display: flex; gap: 8px; }
+.data-input input { flex: 1; padding: 8px; background: #225a88; border: none; border-radius: 8px; color: white; }
+.data-input button { background: #3b82f6; border: none; padding: 8px 16px; border-radius: 8px; color: white; cursor: pointer; }
+.data-list { background: #1b4a60; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; color: #ffd966; word-break: break-all; }
+.stats-results { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; background: #1b4a60; padding: 12px; border-radius: 8px; }
+.stats-results div { color: #ffd966; font-family: monospace; }
+.stats-controls label { color: #b0d0ff; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.stats-controls input { flex: 1; height: 6px; background: #1f5c7a; border-radius: 10px; -webkit-appearance: none; }
+.stats-controls input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: #f9c74f; border-radius: 50%; cursor: pointer; border: 2px solid white; }
+.stats-controls button { background: #3b82f6; border: none; padding: 10px; border-radius: 8px; color: white; cursor: pointer; transition: all 0.2s; }
+.stats-controls button:hover { background: #2563eb; transform: translateY(-2px); }
+.stats-footer { padding: 16px 24px; background: #1b4f6e; border-top: 1px solid #3f9ec0; }
+.key-hint { text-align: center; color: #ffd966; font-size: 0.85rem; }
+kbd { background: #0b1a2f; padding: 4px 12px; border-radius: 20px; border: 1px solid #f9c74f; font-family: monospace; margin: 0 4px; }
+.active-button { border-color: #4fc3ff !important; box-shadow: 0 0 15px #4fc3ff80 !important; }
+@media (max-width: 900px) { .stats-module { flex-direction: column; align-items: center; } .stats-canvas { width: 100%; height: auto; } .stats-header h1 { font-size: 1.5rem; } .stats-tab { padding: 6px 16px; font-size: 0.9rem; } }
+/* Add to both CSS files */
+.keyboard-hint {
+  margin-top: 16px;
+  padding: 8px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  font-size: 0.7rem;
+  color: #b0d0ff;
+}
+
+.keyboard-hint kbd {
+  background: #0b1a2f;
+  border: 1px solid #f9c74f;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  margin: 0 2px;
+}
+
+.active-button {
+  border-color: #4fc3ff !important;
+  box-shadow: 0 0 15px #4fc3ff80 !important;
+  transition: all 0.1s;
+}
+
+/* For input fields */
+input.active-button {
+  outline: 2px solid #4fc3ff;
+  outline-offset: 2px;
+}
+
+/* For buttons */
+button.active-button {
+  background: #4fc3ff !important;
+  color: #000 !important;
+  transform: scale(1.02);
+}
