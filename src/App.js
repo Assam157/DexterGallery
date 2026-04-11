@@ -10,6 +10,9 @@ import RadiationPhysicsLab from "./components/RaadiationPhysicsLab";
 import OpticalDexterLab from "./components/OpticalLab";
 import AstronomyLab from "./components/AStronomyLab";
 import SemiconductorDexterLab from "./components/SemiconducterLab";
+import MathemeticsLab from "./components/MathemeticsLab";
+import RGBMixingExperiment from "./components/RGBMixing";
+import TidesMoonLab from "./components/MoonGravityEffect";
 import EMLab from "./components/EMLab";
 import DigitalGateLab from "./components/DigitalGateLogic";
 import SidebarPhysicsLab from "./components/PhysicsLabSideBar";
@@ -17,7 +20,9 @@ import QuantumSideLab from "./components/QuantumLab";
 import ChemLab from "./components/ChemistrySideLab";
 import "./App.css";
 import DiodeBiasLab from "./components/PN-JunctionDiodeShwoing";
-import PNJunctionDiffusion from "./components/PNJunctionDIode";
+import PNJunctionDiffusion from "./components/PNJunctionDIode"; 
+import CSLab from "./components/CSLab";
+import RoboticsLab from "./components/RoboticsAutomationLab"; // Add Robotics Lab
 
 /* ==============================
    MAIN MENU
@@ -62,45 +67,57 @@ function DexterHome() {
       window.removeEventListener("appinstalled", handleInstalled);
     };
   }, []);
+  
   useEffect(() => {
-  const handleKeyDown = (e) => {
-    // ignore typing inside inputs
-    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+    const handleKeyDown = (e) => {
+      // ignore typing inside inputs
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
 
-    switch (e.key) {
-      case "1":
-        navigate("/radiation");
-        break;
-      case "2":
-        navigate("/optical");
-        break;
-      case "3":
-        navigate("/semiconductor");
-        break;
-      case "4":
-        navigate("/em");
-        break;
-      case "5":
-        navigate("/sid");
-        break;
-      case "6":
-        navigate("/digital");
-        break;
-      case "7":
-        navigate("/quantum");
-        break;
-      case "8":
-        navigate("/astronomy");
-        break;
-      default:
-        break;
-    }
-  };
+      switch (e.key) {
+        case "1":
+          navigate("/radiation");
+          break;
+        case "2":
+          navigate("/optical");
+          break;
+        case "3":
+          navigate("/semiconductor");
+          break;
+        case "4":
+          navigate("/em");
+          break;
+        case "5":
+          navigate("/sid");
+          break;
+        case "6":
+          navigate("/digital");
+          break;
+        case "7":
+          navigate("/quantum");
+          break;
+        case "8":
+          navigate("/astronomy");
+          break;
+        case "9":
+          navigate("/chemistry");
+          break;
+        case "0":
+          navigate("/mathemetics");
+          break;
+        case "-":
+          navigate("/cs");
+          break;
+        case "=":  // Use = key for Robotics Lab
+          navigate("/robotics");
+          break;
+        default:
+          break;
+      }
+    };
 
-  window.addEventListener("keydown", handleKeyDown);
-  return () => window.removeEventListener("keydown", handleKeyDown);
-}, [navigate]);
-
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [navigate]);
 
   /* ==============================
      INSTALL TRIGGER
@@ -124,7 +141,7 @@ function DexterHome() {
   };
 
   /* ==============================
-     UI
+     UI - ORIGINAL VERTICAL LAYOUT
   ============================== */
   return (
     <div
@@ -159,8 +176,9 @@ function DexterHome() {
       <button className="lab-btn" onClick={() => navigate("/radiation")}>
         ☢ Radiation Physics Lab
       </button>
-       <button className="lab-btn" onClick={() => navigate("/chemistry")}>
-       🧪 Chemistry Lab
+      
+      <button className="lab-btn" onClick={() => navigate("/chemistry")}>
+        🧪 Chemistry Lab
       </button>
 
       <button className="lab-btn" onClick={() => navigate("/optical")}>
@@ -170,9 +188,11 @@ function DexterHome() {
       <button className="lab-btn" onClick={() => navigate("/semiconductor")}>
         🔌 Semiconductor Lab
       </button>
-       <button className="lab-btn" onClick={() => navigate("/astronomy")}>
-         🚀 Astronomy Lab
+      
+      <button className="lab-btn" onClick={() => navigate("/astronomy")}>
+        🚀 Astronomy Lab
       </button>
+      
       <button className="lab-btn" onClick={() => navigate("/em")}>
         🧲 Electromagnetism Lab
       </button>
@@ -184,8 +204,21 @@ function DexterHome() {
       <button className="lab-btn" onClick={() => navigate("/digital")}>
         🧩 Digital Lab
       </button>
-       <button className="lab-btn" onClick={() => navigate("/quantum")}>
-         ⚛️ Quantum Lab
+      
+      <button className="lab-btn" onClick={() => navigate("/quantum")}>
+        ⚛️ Quantum Lab
+      </button>
+      
+      <button className="lab-btn" onClick={() => navigate("/mathemetics")}>
+        🧮 Mathematics Lab
+      </button>
+
+      <button className="lab-btn" onClick={() => navigate("/cs")}>
+        💻 Computer Science Lab
+      </button>
+
+      <button className="lab-btn" onClick={() => navigate("/robotics")}>
+        🤖 Robotics & Automation Lab
       </button>
     </div>
   );
@@ -206,17 +239,14 @@ export default function App() {
         <Route path="/em" element={<EMLab />} />
         <Route path="/sid" element={<SidebarPhysicsLab />} />
         <Route path="/digital" element={<DigitalGateLab />} />
-        <Route path="/quantum" element={<QuantumSideLab/>} />
-        <Route path="/chemistry" element={<ChemLab/>}/>
-        <Route path="/PNJN" element={<DiodeBiasLab/>}/>
-        <Route path="/astronomy" element={<AstronomyLab/>}/>
- 
-              <Route
-          path="PN"
-          element={<PNJunctionDiffusion/>}
-        
-        />
-   
+        <Route path="/quantum" element={<QuantumSideLab />} />
+        <Route path="/chemistry" element={<ChemLab />} />
+        <Route path="/PNJN" element={<DiodeBiasLab />} />
+        <Route path="/astronomy" element={<AstronomyLab />} />
+        <Route path="/mathemetics" element={<MathemeticsLab />} />
+        <Route path="/PN" element={<PNJunctionDiffusion />} />
+        <Route path="/cs" element={<CSLab />} />
+        <Route path="/robotics" element={<RoboticsLab />} />
       </Routes>
     </Router>
   );
