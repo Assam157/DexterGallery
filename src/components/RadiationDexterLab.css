@@ -302,3 +302,219 @@ canvas {
     gap: 44px;
   }
 }
+/* Keyboard Feedback */
+.keyboard-feedback {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+
+.keyboard-feedback.active {
+  opacity: 1;
+}
+
+.key-pressed {
+  display: inline-block;
+  background: linear-gradient(135deg, #00ff66, #00aa44);
+  color: #000;
+  font-size: 48px;
+  font-weight: bold;
+  padding: 20px 40px;
+  border-radius: 60px;
+  font-family: monospace;
+  box-shadow: 0 0 30px rgba(0, 255, 102, 0.8);
+  animation: keyPressPop 0.2s ease-out;
+}
+
+@keyframes keyPressPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Keyboard Info Bar */
+.keyboard-info-bar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 220px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(10, 10, 20, 0.95));
+  backdrop-filter: blur(10px);
+  padding: 8px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  border-bottom: 1px solid rgba(0, 255, 102, 0.3);
+  font-size: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.keyboard-shortcuts {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #aaa;
+}
+
+.shortcut kbd {
+  background: #1a1a2a;
+  border: 1px solid #00ff66;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-family: monospace;
+  font-weight: bold;
+  color: #00ff66;
+  font-size: 11px;
+}
+
+.active-element-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0, 255, 102, 0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 255, 102, 0.3);
+}
+
+.active-label {
+  color: #888;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.active-value {
+  color: #00ff66;
+  font-weight: bold;
+  font-size: 12px;
+  animation: pulseText 1s ease-in-out infinite;
+}
+
+@keyframes pulseText {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Selector Buttons */
+.selector-btn {
+  flex: 1;
+  padding: 10px;
+  background: linear-gradient(135deg, #1a1a2a, #0f0f1a);
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  color: #aaa;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.selector-btn.active {
+  background: linear-gradient(135deg, #00aa44, #008833);
+  color: white;
+  border-color: #00ff66;
+  box-shadow: 0 0 15px rgba(0, 255, 102, 0.3);
+}
+
+/* Energy Panel */
+.energy-label {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.energy-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffaa44;
+  margin-bottom: 12px;
+}
+
+/* Slider Wrap */
+.slider-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.slider-tooltip {
+  position: absolute;
+  top: -32px;
+  transform: translateX(-50%);
+  background: #000;
+  color: #fff;
+  padding: 4px 10px;
+  font-size: 11px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow: 0 0 12px rgba(255,255,255,0.45);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Energy Slider */
+.energy-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, #00ff66, #00ffaa);
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+  filter: drop-shadow(0 0 10px rgba(0,255,0,0.5));
+}
+
+.energy-slider.selected {
+  filter: drop-shadow(0 0 15px rgba(0,255,0,0.8));
+}
+
+.energy-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 14px rgba(255,255,255,0.9);
+  cursor: pointer;
+}
+
+/* Mobile Responsive */
+@media (max-width: 900px) {
+  .keyboard-info-bar {
+    left: 0;
+    position: relative;
+  }
+  
+  .dexter-root {
+    flex-direction: column;
+  }
+  
+  .control-panel {
+    width: 100%;
+    border-right: none;
+    border-bottom: 3px solid #111;
+  }
+  
+  canvas {
+    width: 100%;
+  }
+  
+  .energy-panel {
+    margin-top: 20px;
+  }
+}

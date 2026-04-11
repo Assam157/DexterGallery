@@ -1,0 +1,559 @@
+/* ======================================================
+   ALGEBRA LAB STYLES
+   ====================================================== */
+
+.algebra-lab-container {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.algebra-card {
+  max-width: 1200px;
+  width: 100%;
+  background: #1c3a4f;
+  border-radius: 32px;
+  box-shadow: 0 25px 40px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  border: 1px solid #7ab8d0;
+}
+
+.algebra-header {
+  background: #1b4f6e;
+  padding: 20px 28px;
+  border-bottom: 3px solid #f9c74f;
+}
+
+.algebra-header h1 {
+  margin: 0 0 16px 0;
+  font-size: 1.8rem;
+  color: #fff3d1;
+  text-align: center;
+}
+
+.algebra-tabs {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.algebra-tab {
+  background: rgba(10, 48, 64, 0.8);
+  border: none;
+  padding: 10px 24px;
+  border-radius: 40px;
+  color: #b0d0ff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.algebra-tab.active {
+  background: #f9c74f;
+  color: #022b3b;
+  box-shadow: 0 0 15px #ffb700;
+}
+
+.algebra-tab:hover {
+  transform: translateY(-2px);
+}
+
+.algebra-content {
+  padding: 24px;
+  min-height: 500px;
+}
+
+.module-container {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* ======================================================
+   LINEAR EQUATIONS MODULE
+   ====================================================== */
+
+.equation-display {
+  background: #0e3a4c;
+  border-radius: 24px;
+  padding: 24px;
+}
+
+.equation-display h3 {
+  color: #ffd966;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 24px;
+  font-family: monospace;
+}
+
+.equation-visual {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.slider-group {
+  margin: 20px 0;
+}
+
+.slider-group label {
+  display: flex;
+  justify-content: space-between;
+  color: #b0d0ff;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.slider-group .value {
+  color: #ffd966;
+  font-family: monospace;
+  font-size: 1.1rem;
+}
+
+.slider-group input {
+  width: 100%;
+  height: 6px;
+  background: #1f5c7a;
+  border-radius: 10px;
+  -webkit-appearance: none;
+}
+
+.slider-group input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #f9c74f;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid white;
+}
+
+.slider-group input.active-button {
+  box-shadow: 0 0 15px #4fc3ff;
+}
+
+.solution-box {
+  background: #1b4a60;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 24px;
+  text-align: center;
+}
+
+.solution-title {
+  color: #ffd966;
+  font-weight: bold;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+}
+
+.solution-value {
+  color: #e2e8f0;
+  font-family: monospace;
+  font-size: 1rem;
+  margin: 8px 0;
+}
+
+.toggle-solution {
+  background: #225a88;
+  border: none;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.2s;
+}
+
+.toggle-solution:hover {
+  background: #2d6a98;
+  transform: translateY(-2px);
+}
+
+/* ======================================================
+   MATRIX ALGEBRA MODULE
+   ====================================================== */
+
+.matrix-section {
+  background: #0e3a4c;
+  border-radius: 24px;
+  padding: 24px;
+}
+
+.matrix-section h3 {
+  color: #ffd966;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.matrix-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.matrix-a, .matrix-b, .matrix-x {
+  text-align: center;
+}
+
+.matrix-title {
+  color: #b0d0ff;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.matrix-row {
+  display: flex;
+  gap: 10px;
+  margin: 8px 0;
+}
+
+.matrix-input {
+  width: 70px;
+  padding: 8px;
+  background: #1b4a60;
+  border: 2px solid #3f9ec0;
+  border-radius: 8px;
+  color: #ffd966;
+  font-family: monospace;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.matrix-input.active-button {
+  border-color: #4fc3ff;
+  box-shadow: 0 0 15px #4fc3ff80;
+}
+
+.vector-input {
+  width: 70px;
+  margin: 8px 0;
+}
+
+.matrix-vector {
+  background: #1b4a60;
+  padding: 20px 15px;
+  border-radius: 12px;
+  font-family: monospace;
+  font-size: 1.2rem;
+  color: #ffd966;
+}
+
+.matrix-vector div {
+  margin: 12px 0;
+}
+
+.matrix-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.matrix-buttons button {
+  background: #225a88;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 40px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.matrix-buttons button:hover {
+  background: #2d6a98;
+  transform: translateY(-2px);
+}
+
+.matrix-buttons button.active-button {
+  background: #4fc3ff;
+  color: #000;
+  box-shadow: 0 0 15px #4fc3ff;
+}
+
+.matrix-result {
+  background: #1b4a60;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.matrix-result h4 {
+  color: #ffd966;
+  margin-bottom: 12px;
+}
+
+.matrix-result .error {
+  color: #ff8888;
+}
+
+.result-matrix {
+  font-family: monospace;
+  font-size: 1.1rem;
+  color: #ffd966;
+}
+
+.result-row {
+  margin: 5px 0;
+}
+
+/* ======================================================
+   FUNCTION GRAPHING MODULE
+   ====================================================== */
+
+.graphing-section {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.graph-container {
+  flex: 2;
+  min-width: 300px;
+  background: #0b2a38;
+  border-radius: 16px;
+  padding: 10px;
+  border: 2px solid #3f9ec0;
+}
+
+.function-canvas {
+  width: 100%;
+  height: auto;
+  background: #0b2a38;
+  border-radius: 12px;
+}
+
+.function-controls {
+  flex: 1;
+  min-width: 280px;
+  background: #0e3a4c;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.add-function {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.expr-input {
+  flex: 1;
+  padding: 10px;
+  background: #1b4a60;
+  border: 2px solid #3f9ec0;
+  border-radius: 8px;
+  color: #ffd966;
+  font-family: monospace;
+}
+
+.expr-input.active-button {
+  border-color: #4fc3ff;
+  box-shadow: 0 0 15px #4fc3ff80;
+}
+
+.add-function button {
+  background: #225a88;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-function button:hover {
+  background: #2d6a98;
+}
+
+.range-controls {
+  margin: 20px 0;
+}
+
+.functions-list {
+  margin-top: 20px;
+}
+
+.functions-list h4 {
+  color: #ffd966;
+  margin-bottom: 12px;
+}
+
+.function-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background: #1b4a60;
+  border-radius: 8px;
+  margin: 8px 0;
+}
+
+.function-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.function-expr {
+  flex: 1;
+  font-family: monospace;
+  color: #e2e8f0;
+}
+
+.function-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.function-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.function-actions button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.examples {
+  margin-top: 20px;
+}
+
+.examples h4 {
+  color: #ffd966;
+  margin-bottom: 8px;
+}
+
+.examples button {
+  background: #225a88;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: white;
+  cursor: pointer;
+  margin: 4px;
+  font-size: 0.8rem;
+}
+
+.examples button:hover {
+  background: #2d6a98;
+}
+
+/* ======================================================
+   FOOTER & KEYBOARD HINTS
+   ====================================================== */
+
+.algebra-footer {
+  padding: 16px 24px;
+  background: #1b4f6e;
+  border-top: 1px solid #3f9ec0;
+}
+
+.key-hint {
+  text-align: center;
+  color: #ffd966;
+  font-size: 0.85rem;
+}
+
+kbd {
+  background: #0b1a2f;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid #f9c74f;
+  font-family: monospace;
+  margin: 0 4px;
+}
+
+.active-button {
+  border-color: #4fc3ff !important;
+  box-shadow: 0 0 15px #4fc3ff80 !important;
+  transition: all 0.1s;
+}
+
+/* ======================================================
+   ANIMATIONS
+   ====================================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ======================================================
+   RESPONSIVE DESIGN
+   ====================================================== */
+
+@media (max-width: 900px) {
+  .algebra-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .algebra-tab {
+    padding: 6px 16px;
+    font-size: 0.9rem;
+  }
+  
+  .graphing-section {
+    flex-direction: column;
+  }
+  
+  .matrix-grid {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .matrix-buttons {
+    flex-direction: column;
+  }
+  
+  .matrix-buttons button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .algebra-content {
+    padding: 16px;
+  }
+  
+  .equation-display h3 {
+    font-size: 1.2rem;
+  }
+  
+  .matrix-input {
+    width: 60px;
+    padding: 6px;
+  }
+  
+  .function-item {
+    flex-wrap: wrap;
+  }
+  
+  .add-function {
+    flex-direction: column;
+  }
+  
+  .examples button {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
+}

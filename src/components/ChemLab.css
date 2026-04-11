@@ -1,140 +1,225 @@
-/* ===============================
-   GLOBAL MOBILE SAFETY (ROOT SCROLLER)
-   =============================== */
-
-html,
-body {
-  width: 100%;
-  min-height: 100%;
-  margin: 0;
-  padding: 0;
-
-  overflow-y: auto;              /* ✅ main scroll */
-  overflow-x: hidden;
-
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
+ /* ================= GLOBAL LAYOUT ================= */
+.lab-root {
+  display: flex;
+  height: 100vh;
+  background: #0a0c15;
+  font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+  overflow: hidden;
 }
 
-/* ===============================
-   GLOBAL LAB BACKGROUND
-   =============================== */
-
-.lab-root {
-  width: 100%;
-  min-height: 100vh;             /* ✅ grow naturally */
-  background: #e5e7eb;
-
+/* ================= LEFT PANEL ================= */
+.lab-panel {
+  width: 280px;
+  background: linear-gradient(180deg, #11161f 0%, #0c0f18 100%);
+  border-right: 1px solid #2a3a5a;
   display: flex;
   flex-direction: column;
-
-  overflow: visible;             /* ❌ DO NOT lock */
+  overflow-y: auto;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
 }
 
-/* ===============================
-   CHEM LAB PANEL — FULL SCROLL
-   =============================== */
-
-.chem-lab,
-.lab-panel,
-.lab-controls {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-
-  overflow: visible;             /* 🔑 allow content flow */
+.experiment-shell {
+  padding: 24px 16px;
+  flex: 1;
 }
-
-/* ===============================
-   MOBILE OVERRIDES
-   =============================== */
-
-@media (max-width: 768px) {
-  .chem-lab,
-  .lab-panel {
-    min-height: auto;            /* ❌ remove vh traps */
-    height: auto;
-
-    overflow: visible;           /* 🔑 body handles scroll */
-    padding-bottom: 40px;
-  }
-}
-
-/* ===============================
-   PANEL TITLE
-   =============================== */
 
 .lab-panel-title {
-  font-weight: bold;
-  margin-bottom: 12px;
-  letter-spacing: 1px;
-  font-size: 16px;
+  font-size: 22px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #eef4ff, #b3cdff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 32px;
   text-align: center;
+  letter-spacing: 1px;
 }
-
-/* ===============================
-   BUTTONS — TOUCH FRIENDLY
-   =============================== */
 
 .panel-btn {
   width: 100%;
-  padding: 14px 16px;
-  margin-bottom: 10px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  background: rgba(30, 40, 60, 0.5);
+  border: 1px solid #2a3a5a;
   border-radius: 12px;
-  font-size: 15px;
+  color: #ccddf8;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
 }
 
-.panel-btn.disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.panel-btn:hover {
+  background: rgba(50, 70, 100, 0.6);
+  border-color: #5f8eff;
+  transform: translateX(4px);
 }
 
-/* ===============================
-   SELECT / INPUT — MOBILE READY
-   =============================== */
-
-select,
-input,
-button {
-  font-size: 16px;               /* ✅ prevents iOS zoom */
-  touch-action: manipulation;
+.panel-btn.active {
+  background: linear-gradient(135deg, #2a4a8a, #1a3a6a);
+  border-color: #8ab3ff;
+  color: white;
+  box-shadow: 0 4px 12px rgba(42, 108, 255, 0.3);
 }
 
-select {
-  width: 100%;
-  padding: 12px;
-  margin-top: 8px;
-  background: #0f172a;
+.back-btn {
+  background: rgba(200, 70, 70, 0.2);
+  border-color: #aa5555;
+  color: #ffaaaa;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.back-btn:hover {
+  background: rgba(200, 70, 70, 0.4);
+  border-color: #ff8888;
   color: #fff;
-  border: 1px solid #334155;
+}
+
+.lab-panel-info {
+  margin-top: 40px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  border: 1px solid #2a3a5a;
+}
+
+.info-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #8ab3ff;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.info-text {
+  font-size: 11px;
+  color: #9aabca;
+  margin-bottom: 4px;
+  font-family: monospace;
+}
+
+/* ================= CENTER VIEWPORT ================= */
+.lab-canvas-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: auto;
+  padding: 20px;
+}
+
+.global-canvas-frame {
+  background: radial-gradient(circle at 30% 20%, #1a1f2e, #0a0f1a);
+  border-radius: 28px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: auto;
+  position: relative;
+}
+
+.global-canvas-scale {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  min-width: 100%;
+}
+
+.lab-back {
+  position: absolute;
+  bottom: 24px;
+  right: 32px;
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid #5f8eff;
+  border-radius: 40px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.lab-back:hover {
+  background: #5f8eff;
+  border-color: #fff;
+  transform: scale(1.05);
+}
+
+/* ================= SCROLLBAR STYLES ================= */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0f1e;
   border-radius: 10px;
 }
 
-input[type="range"] {
-  width: 100%;
-  margin-top: 10px;
+::-webkit-scrollbar-thumb {
+  background: #3c5bbf;
+  border-radius: 10px;
 }
 
-/* ===============================
-   OPTIONAL INTERNAL SCROLL AREAS
-   =============================== */
-
-.lab-scroll-area {
-  max-height: none;              /* ❌ remove clamp */
-  overflow: visible;             /* 🔑 no scroll nesting */
+::-webkit-scrollbar-thumb:hover {
+  background: #5f8eff;
 }
 
-/* ===============================
-   RIPPLE ANIMATION
-   =============================== */
-
-@keyframes ripple {
-  0% {
-    transform: translateX(-50%) scale(0.3);
-    opacity: 0.8;
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1200px) {
+  .lab-panel {
+    width: 240px;
   }
-  100% {
-    transform: translateX(-50%) scale(2.4);
-    opacity: 0;
+  
+  .global-canvas-frame {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 900px) {
+  .lab-root {
+    flex-direction: column;
+  }
+  
+  .lab-panel {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #2a3a5a;
+  }
+  
+  .experiment-shell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px;
+  }
+  
+  .panel-btn {
+    width: auto;
+    flex: 1;
+    min-width: 140px;
+    margin-bottom: 0;
+    text-align: center;
+  }
+  
+  .lab-panel-title {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  .back-btn {
+    margin-bottom: 0;
+  }
+  
+  .lab-panel-info {
+    display: none;
   }
 }

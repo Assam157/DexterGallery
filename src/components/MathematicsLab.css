@@ -1,0 +1,925 @@
+/* ======================================================
+   MATHEMATICS LAB - GLOBAL STYLES
+   ====================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.math-lab-root {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ======================================================
+   LEFT PANEL STYLES
+   ====================================================== */
+
+.math-left-panel {
+  width: 320px;
+  background: linear-gradient(180deg, #0f172a 0%, #0a0f1a 100%);
+  border-right: 1px solid rgba(100, 150, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-y: auto;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.math-left-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.math-left-panel::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.math-left-panel::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 3px;
+}
+
+.math-panel-header {
+  padding: 28px 20px;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+  text-align: center;
+}
+
+.math-panel-header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #60a5fa, #a855f7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.math-lab-badge {
+  display: inline-block;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid #3b82f6;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: #60a5fa;
+}
+
+/* Experiment List */
+.math-experiment-list {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.math-exp-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.math-exp-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  transform: translateX(5px);
+}
+
+.math-exp-btn.active {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-color: #60a5fa;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+.exp-icon {
+  font-size: 1.8rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+}
+
+.exp-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.exp-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #f1f5f9;
+}
+
+.exp-desc {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.math-exp-btn.active .exp-name {
+  color: white;
+}
+
+.math-exp-btn.active .exp-desc {
+  color: #e2e8f0;
+}
+
+/* Footer Panel */
+.math-panel-footer {
+  padding: 20px;
+  border-top: 1px solid rgba(59, 130, 246, 0.3);
+  margin-top: auto;
+}
+
+.keyboard-shortcuts {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.shortcut-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #60a5fa;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.shortcut-item {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shortcut-item kbd {
+  background: #0f172a;
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.65rem;
+  font-family: monospace;
+  color: #60a5fa;
+}
+
+.back-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+}
+
+/* ======================================================
+   RIGHT CONTENT AREA
+   ====================================================== */
+
+.math-content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.math-canvas-container {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+  background: radial-gradient(circle at 30% 20%, #0f172a, #020617);
+}
+
+/* Coming Soon Placeholder */
+.coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  text-align: center;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 32px;
+  border: 2px dashed rgba(59, 130, 246, 0.3);
+  padding: 48px;
+}
+
+.soon-icon {
+  font-size: 5rem;
+  margin-bottom: 20px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.coming-soon h3 {
+  font-size: 1.8rem;
+  color: #60a5fa;
+  margin-bottom: 12px;
+}
+
+.coming-soon p {
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+/* ======================================================
+   RESPONSIVE DESIGN
+   ====================================================== */
+
+@media (max-width: 1024px) {
+  .math-left-panel {
+    width: 280px;
+  }
+  
+  .math-panel-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .exp-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .exp-name {
+    font-size: 0.9rem;
+  }
+  
+  .exp-desc {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .math-lab-root {
+    flex-direction: column;
+  }
+  
+  .math-left-panel {
+    width: 100%;
+    max-height: 280px;
+    border-right: none;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+  }
+  
+  .math-experiment-list {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  .math-exp-btn {
+    min-width: 180px;
+    flex-shrink: 0;
+  }
+  
+  .math-panel-footer {
+    display: none;
+  }
+  
+  .math-canvas-container {
+    padding: 12px;
+  }
+  
+  .coming-soon {
+    min-height: 400px;
+    padding: 24px;
+  }
+  
+  .soon-icon {
+    font-size: 3rem;
+  }
+  
+  .coming-soon h3 {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .math-left-panel {
+    max-height: 240px;
+  }
+  
+  .math-panel-header {
+    padding: 16px;
+  }
+  
+  .math-panel-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .math-lab-badge {
+    font-size: 0.65rem;
+  }
+  
+  .math-exp-btn {
+    min-width: 140px;
+    padding: 10px 12px;
+  }
+  
+  .exp-icon {
+    font-size: 1.2rem;
+    width: 32px;
+    height: 32px;
+  }
+  
+  .exp-name {
+    font-size: 0.8rem;
+  }
+  
+  .exp-desc {
+    display: none;
+  }
+  
+  .coming-soon {
+    padding: 16px;
+  }
+  
+  .soon-icon {
+    font-size: 2.5rem;
+  }
+  
+  .coming-soon h3 {
+    font-size: 1.1rem;
+  }
+  
+  .coming-soon p {
+    font-size: 0.85rem;
+  }
+}
+
+/* ======================================================
+   CUSTOM SCROLLBAR
+   ====================================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #60a5fa, #a855f7);
+}
+
+/* ======================================================
+   ANIMATIONS
+   ====================================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.math-canvas-container {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.math-exp-btn {
+  animation: fadeIn 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+.math-exp-btn:nth-child(1) { animation-delay: 0.05s; }
+.math-exp-btn:nth-child(2) { animation-delay: 0.1s; }
+.math-exp-btn:nth-child(3) { animation-delay: 0.15s; }
+.math-exp-btn:nth-child(4) { animation-delay: 0.2s; }
+.math-exp-btn:nth-child(5) { animation-delay: 0.25s; }
+.math-exp-btn:nth-child(6) { animation-delay: 0.3s; }
+/* ======================================================
+   MATHEMATICS LAB - GLOBAL STYLES
+   ====================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.math-lab-root {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ======================================================
+   LEFT PANEL STYLES
+   ====================================================== */
+
+.math-left-panel {
+  width: 320px;
+  background: linear-gradient(180deg, #0f172a 0%, #0a0f1a 100%);
+  border-right: 1px solid rgba(100, 150, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-y: auto;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.math-left-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.math-left-panel::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.math-left-panel::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 3px;
+}
+
+.math-panel-header {
+  padding: 28px 20px;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+  text-align: center;
+}
+
+.math-panel-header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #60a5fa, #a855f7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.math-lab-badge {
+  display: inline-block;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid #3b82f6;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: #60a5fa;
+}
+
+/* Experiment List */
+.math-experiment-list {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.math-exp-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.math-exp-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  transform: translateX(5px);
+}
+
+.math-exp-btn.active {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-color: #60a5fa;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+.exp-icon {
+  font-size: 1.8rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+}
+
+.exp-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.exp-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #f1f5f9;
+}
+
+.exp-desc {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.math-exp-btn.active .exp-name {
+  color: white;
+}
+
+.math-exp-btn.active .exp-desc {
+  color: #e2e8f0;
+}
+
+/* Footer Panel */
+.math-panel-footer {
+  padding: 20px;
+  border-top: 1px solid rgba(59, 130, 246, 0.3);
+  margin-top: auto;
+}
+
+.keyboard-shortcuts {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.shortcut-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #60a5fa;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.shortcut-item {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shortcut-item kbd {
+  background: #0f172a;
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.65rem;
+  font-family: monospace;
+  color: #60a5fa;
+}
+
+.back-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+}
+
+/* ======================================================
+   RIGHT CONTENT AREA
+   ====================================================== */
+
+.math-content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.math-canvas-container {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+  background: radial-gradient(circle at 30% 20%, #0f172a, #020617);
+}
+
+/* Coming Soon Placeholder */
+.coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  text-align: center;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 32px;
+  border: 2px dashed rgba(59, 130, 246, 0.3);
+  padding: 48px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.soon-icon {
+  font-size: 5rem;
+  margin-bottom: 20px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.coming-soon h3 {
+  font-size: 1.8rem;
+  color: #60a5fa;
+  margin-bottom: 12px;
+}
+
+.coming-soon p {
+  color: #94a3b8;
+  font-size: 1rem;
+  margin-bottom: 24px;
+}
+
+.soon-features {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.feature {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 8px 16px;
+  border-radius: 40px;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  transition: all 0.3s;
+}
+
+.feature:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #60a5fa;
+  color: #e2e8f0;
+  transform: translateY(-2px);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ======================================================
+   RESPONSIVE DESIGN
+   ====================================================== */
+
+@media (max-width: 1024px) {
+  .math-left-panel {
+    width: 280px;
+  }
+  
+  .math-panel-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .exp-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .exp-name {
+    font-size: 0.9rem;
+  }
+  
+  .exp-desc {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .math-lab-root {
+    flex-direction: column;
+  }
+  
+  .math-left-panel {
+    width: 100%;
+    max-height: 280px;
+    border-right: none;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+  }
+  
+  .math-experiment-list {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  .math-exp-btn {
+    min-width: 180px;
+    flex-shrink: 0;
+  }
+  
+  .math-panel-footer {
+    display: none;
+  }
+  
+  .math-canvas-container {
+    padding: 12px;
+  }
+  
+  .coming-soon {
+    min-height: 400px;
+    padding: 24px;
+  }
+  
+  .soon-icon {
+    font-size: 3rem;
+  }
+  
+  .coming-soon h3 {
+    font-size: 1.3rem;
+  }
+  
+  .soon-features {
+    gap: 12px;
+  }
+  
+  .feature {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .math-left-panel {
+    max-height: 240px;
+  }
+  
+  .math-panel-header {
+    padding: 16px;
+  }
+  
+  .math-panel-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .math-lab-badge {
+    font-size: 0.65rem;
+  }
+  
+  .math-exp-btn {
+    min-width: 140px;
+    padding: 10px 12px;
+  }
+  
+  .exp-icon {
+    font-size: 1.2rem;
+    width: 32px;
+    height: 32px;
+  }
+  
+  .exp-name {
+    font-size: 0.8rem;
+  }
+  
+  .exp-desc {
+    display: none;
+  }
+  
+  .coming-soon {
+    padding: 16px;
+  }
+  
+  .soon-icon {
+    font-size: 2.5rem;
+  }
+  
+  .coming-soon h3 {
+    font-size: 1.1rem;
+  }
+  
+  .coming-soon p {
+    font-size: 0.85rem;
+  }
+  
+  .soon-features {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .feature {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ======================================================
+   CUSTOM SCROLLBAR
+   ====================================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #60a5fa, #a855f7);
+}

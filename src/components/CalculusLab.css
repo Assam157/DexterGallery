@@ -1,0 +1,132 @@
+.calc-lab-container { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: center; }
+.calc-card { max-width: 1200px; width: 100%; background: #1c3a4f; border-radius: 32px; box-shadow: 0 25px 40px rgba(0,0,0,0.7); overflow: hidden; border: 1px solid #7ab8d0; }
+.calc-header { background: #1b4f6e; padding: 20px 28px; border-bottom: 3px solid #f9c74f; }
+.calc-header h1 { margin: 0 0 16px 0; font-size: 1.8rem; color: #fff3d1; text-align: center; }
+.calc-tabs { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.calc-tab { background: rgba(10,48,64,0.8); border: none; padding: 10px 24px; border-radius: 40px; color: #b0d0ff; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 1rem; }
+.calc-tab.active { background: #f9c74f; color: #022b3b; box-shadow: 0 0 15px #ffb700; }
+.calc-tab:hover { transform: translateY(-2px); }
+.calc-content { padding: 24px; min-height: 500px; }
+.calc-module { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+.calc-canvas { width: 600px; height: 400px; background: #0b2a38; border-radius: 12px; border: 2px solid #3f9ec0; }
+.calc-controls { flex: 1; min-width: 280px; background: #0e3a4c; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.calc-controls select { background: #225a88; color: white; padding: 10px; border: none; border-radius: 8px; cursor: pointer; }
+.calc-controls label { color: #b0d0ff; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.calc-controls input { flex: 1; height: 6px; background: #1f5c7a; border-radius: 10px; -webkit-appearance: none; }
+.calc-controls input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: #f9c74f; border-radius: 50%; cursor: pointer; border: 2px solid white; }
+.calc-controls span { color: #ffd966; font-family: monospace; min-width: 40px; text-align: right; }
+.derivative-result { background: #1b4a60; padding: 12px; border-radius: 8px; text-align: center; color: #ffd966; font-family: monospace; font-size: 1.1rem; }
+.calc-footer { padding: 16px 24px; background: #1b4f6e; border-top: 1px solid #3f9ec0; }
+.key-hint { text-align: center; color: #ffd966; font-size: 0.85rem; }
+kbd { background: #0b1a2f; padding: 4px 12px; border-radius: 20px; border: 1px solid #f9c74f; font-family: monospace; margin: 0 4px; }
+.active-button { border-color: #4fc3ff !important; box-shadow: 0 0 15px #4fc3ff80 !important; }
+@media (max-width: 900px) { .calc-module { flex-direction: column; align-items: center; } .calc-canvas { width: 100%; height: auto; } .calc-header h1 { font-size: 1.5rem; } .calc-tab { padding: 6px 16px; font-size: 0.9rem; } }
+/* Add to both CSS files */
+.keyboard-hint {
+  margin-top: 16px;
+  padding: 8px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  font-size: 0.7rem;
+  color: #b0d0ff;
+}
+
+.keyboard-hint kbd {
+  background: #0b1a2f;
+  border: 1px solid #f9c74f;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  margin: 0 2px;
+}
+
+.active-button {
+  border-color: #4fc3ff !important;
+  box-shadow: 0 0 15px #4fc3ff80 !important;
+  transition: all 0.1s;
+}
+
+/* For input fields */
+input.active-button {
+  outline: 2px solid #4fc3ff;
+  outline-offset: 2px;
+}
+
+/* For buttons */
+button.active-button {
+  background: #4fc3ff !important;
+  color: #000 !important;
+  transform: scale(1.02);
+}
+/* Add these styles to CalculusLab.css */
+
+.control-group {
+  margin-bottom: 12px;
+}
+
+.control-group label {
+  color: #b0d0ff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.control-group span {
+  color: #ffd966;
+  font-family: monospace;
+  min-width: 40px;
+  text-align: right;
+}
+
+.function-select {
+  width: 100%;
+  padding: 8px 12px;
+  background: #225a88;
+  color: white;
+  border: 2px solid #3f9ec0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.function-select:hover {
+  background: #2d6a98;
+  border-color: #4fc3ff;
+}
+
+.function-select.active-button {
+  border-color: #4fc3ff !important;
+  box-shadow: 0 0 15px #4fc3ff80 !important;
+  background: #4fc3ff;
+  color: #000;
+}
+
+.function-select option {
+  background: #1b4a60;
+  color: white;
+}
+
+.keyboard-hint {
+  margin-top: 16px;
+  padding: 10px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  font-size: 0.7rem;
+  color: #b0d0ff;
+  line-height: 1.5;
+}
+
+.keyboard-hint kbd {
+  background: #0b1a2f;
+  border: 1px solid #f9c74f;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  margin: 0 2px;
+  display: inline-block;
+}

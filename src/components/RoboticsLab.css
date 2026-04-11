@@ -1,0 +1,263 @@
+/* RoboticsLab.css */
+.robotics-root {
+  display: flex;
+  height: 100vh;
+  background: linear-gradient(135deg, #0a0a2a, #000000);
+  font-family: monospace;
+  overflow: hidden;
+}
+
+/* ========== SIDEBAR ========== */
+.robotics-sidebar {
+  width: 280px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border-right: 2px solid #00ffff;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.robotics-back-btn {
+  padding: 10px 20px;
+  background: rgba(0, 30, 0, 0.8);
+  border: 1px solid #0f0;
+  border-radius: 25px;
+  color: #0f0;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  margin-bottom: 20px;
+}
+
+.robotics-back-btn:hover {
+  background: rgba(0, 255, 0, 0.2);
+  transform: translateX(-3px);
+}
+
+.robotics-title {
+  color: #00ffff;
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #00ffff;
+}
+
+.robotics-title.green {
+  color: #0f0;
+  border-bottom-color: #0f0;
+}
+
+.robotics-exp-btn {
+  width: 100%;
+  padding: 12px;
+  background: rgba(0, 20, 0, 0.6);
+  border: 1px solid #1f5c7a;
+  border-radius: 12px;
+  color: #8f8;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 0.9rem;
+  text-align: left;
+  transition: all 0.3s;
+  margin-bottom: 8px;
+}
+
+.robotics-exp-btn:hover {
+  background: rgba(0, 255, 255, 0.1);
+  transform: translateX(5px);
+  border-color: #00ffff;
+}
+
+.robotics-exp-btn.active {
+  background: rgba(0, 255, 255, 0.2);
+  border-color: #00ffff;
+  color: #00ffff;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+/* ========== CENTER PANEL ========== */
+.robotics-center {
+  flex: 1;
+  position: relative;
+  background: #0a0a2a;
+  margin: 20px;
+  border-radius: 20px;
+  border: 2px solid #00ffff;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+}
+
+.robotics-overlay-title {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: #00ffff;
+  font-size: 0.85rem;
+  font-family: monospace;
+  border-left: 3px solid #00ffff;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ========== CONTROLS PANEL ========== */
+.robotics-controls {
+  width: 300px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border-left: 2px solid #0f0;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.robotics-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.robotics-control-group label {
+  color: #8f8;
+  font-size: 0.85rem;
+}
+
+.robotics-control-group input[type="range"] {
+  width: 100%;
+  height: 5px;
+  background: #1f5c7a;
+  border-radius: 5px;
+  -webkit-appearance: none;
+}
+
+.robotics-control-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  background: #00ffff;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid white;
+}
+
+.robotics-control-group select {
+  padding: 8px;
+  background: rgba(0, 30, 0, 0.8);
+  border: 1px solid #0f0;
+  border-radius: 8px;
+  color: #0f0;
+  font-family: monospace;
+  cursor: pointer;
+}
+
+.robotics-control-group span {
+  color: #00ffff;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.robotics-info-box {
+  background: rgba(0, 255, 255, 0.1);
+  border-left: 3px solid #00ffff;
+  padding: 12px;
+  border-radius: 8px;
+  color: #8f8;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.robotics-keyboard-hint {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #1f5c7a;
+  text-align: center;
+  color: #6a6;
+  font-size: 0.7rem;
+}
+
+kbd {
+  background: #000;
+  border: 1px solid #0f0;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: #0f0;
+  margin: 0 2px;
+}
+
+/* Scrollbar */
+.robotics-sidebar::-webkit-scrollbar,
+.robotics-controls::-webkit-scrollbar {
+  width: 6px;
+}
+
+.robotics-sidebar::-webkit-scrollbar-track,
+.robotics-controls::-webkit-scrollbar-track {
+  background: #0a0a2a;
+}
+
+.robotics-sidebar::-webkit-scrollbar-thumb,
+.robotics-controls::-webkit-scrollbar-thumb {
+  background: #00ffff;
+  border-radius: 3px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .robotics-sidebar {
+    width: 200px;
+  }
+  
+  .robotics-controls {
+    width: 250px;
+  }
+  
+  .robotics-exp-btn {
+    font-size: 0.75rem;
+    padding: 8px;
+  }
+}
+
+/* Add to RoboticsLab.css */
+.robotics-control-group {
+  transition: all 0.3s ease;
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.active-slider-group {
+  background: rgba(0, 255, 136, 0.15);
+  border-left: 3px solid #00ff88;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+.active-slider-group label {
+  color: #00ff88 !important;
+  font-weight: bold;
+}
+
+.active-slider-group span {
+  color: #00ff88 !important;
+  font-weight: bold;
+}
+
+.keyboard-hint-top kbd {
+  background: #000;
+  border: 1px solid #0f0;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: #0f0;
+  margin: 0 2px;
+}

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PolarisationExperiment from "./PolarizationExperiment";
 import ConcaveMirrorPhysicsLab from "./MirrorExperiment";
+import RGBMixingExperiment from "./RGBMixing";
 import "./RadiationDexterLab.css";
 
 const W = 700;
@@ -537,6 +538,8 @@ function changeIncidentMedium(newIncident) {
     // =========  Mirror Handled in its own component=========
     if (experiment === "Concave") return;
 
+    if (experiment==="RGB") return;
+
     // ========= REFRACTION =========
     if (experiment === "refraction") {
       if (e.key === "a" || e.key === "A") {
@@ -585,6 +588,13 @@ function changeIncidentMedium(newIncident) {
       <button
         className={experiment === "Polarization" ? "active" : ""}
         onClick={() => setExperiment("Polarization")}
+      >
+        Polarization Experiment
+      </button>
+      
+      <button
+        className={experiment === "RGB" ? "active" : ""}
+        onClick={() => setExperiment("RGB")}
       >
         Polarization Experiment
       </button>
@@ -680,7 +690,8 @@ function changeIncidentMedium(newIncident) {
         height={H}
         style={{
           display: experiment === "Polarization" ? "none" : "block",
-          display: experiment === "Concave" ? "none":"block"
+          display: experiment === "Concave" ? "none":"block",
+          display: experiment === "RGB" ? "none":"block"
         }}
       />
 
@@ -692,11 +703,18 @@ function changeIncidentMedium(newIncident) {
           setLightOn={setLightOn}
         />
       )}
+       {experiment === "Polarization" && (
+        <PolarisationExperiment
+          key="polarization"
+          lightOn={lightOn}
+          setLightOn={setLightOn}
+        />
+      )}
       
        {/* ===== MIRROR EXPERIMENT ===== */}
-      {experiment === "Concave" && (
-        <ConcaveMirrorPhysicsLab
-          key="concave"
+      {experiment === "RGB" && (
+        <RGBMixingExperiment
+          key="rgb"
           lightOn={lightOn}
           setLightOn={setLightOn}
         />

@@ -1,0 +1,350 @@
+/* CS Labs Common Styles */
+.cs-lab-container {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cs-card {
+  max-width: 1200px;
+  width: 100%;
+  background: #1c3a4f;
+  border-radius: 32px;
+  box-shadow: 0 25px 40px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  border: 1px solid #7ab8d0;
+}
+
+.cs-header {
+  background: #1b4f6e;
+  padding: 20px 28px;
+  border-bottom: 3px solid #f9c74f;
+}
+
+.cs-header h1 {
+  margin: 0 0 16px 0;
+  font-size: 1.8rem;
+  color: #fff3d1;
+  text-align: center;
+}
+
+.cs-tabs {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cs-tab {
+  background: rgba(10, 48, 64, 0.8);
+  border: none;
+  padding: 10px 24px;
+  border-radius: 40px;
+  color: #b0d0ff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.cs-tab.active {
+  background: #f9c74f;
+  color: #022b3b;
+  box-shadow: 0 0 15px #ffb700;
+}
+
+.cs-tab:hover {
+  transform: translateY(-2px);
+}
+
+.cs-content {
+  padding: 24px;
+  min-height: 500px;
+}
+
+.cs-module {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cs-canvas {
+  width: 600px;
+  height: 400px;
+  background: #0b2a38;
+  border-radius: 12px;
+  border: 2px solid #3f9ec0;
+}
+
+.cs-controls {
+  flex: 1;
+  min-width: 280px;
+  background: #0e3a4c;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cs-controls select,
+.cs-controls input[type="text"],
+.cs-controls textarea {
+  width: 100%;
+  padding: 10px;
+  background: #225a88;
+  border: 2px solid #3f9ec0;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+  font-family: monospace;
+  resize: vertical;
+}
+
+.cs-controls select:focus,
+.cs-controls input:focus,
+.cs-controls textarea:focus {
+  outline: none;
+  border-color: #4fc3ff;
+}
+
+.cs-controls label {
+  color: #b0d0ff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.cs-controls input[type="range"] {
+  flex: 1;
+  height: 6px;
+  background: #1f5c7a;
+  border-radius: 10px;
+  -webkit-appearance: none;
+}
+
+.cs-controls input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #f9c74f;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid white;
+}
+
+.cs-controls button {
+  background: #3b82f6;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cs-controls button:hover:not(:disabled) {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+
+.cs-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cs-footer {
+  padding: 16px 24px;
+  background: #1b4f6e;
+  border-top: 1px solid #3f9ec0;
+}
+
+.key-hint {
+  text-align: center;
+  color: #ffd966;
+  font-size: 0.85rem;
+}
+
+.keyboard-hint {
+  margin-top: 8px;
+  padding: 8px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  font-size: 0.7rem;
+  color: #b0d0ff;
+}
+
+kbd {
+  background: #0b1a2f;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid #f9c74f;
+  font-family: monospace;
+  margin: 0 4px;
+}
+
+.active-button {
+  border-color: #4fc3ff !important;
+  box-shadow: 0 0 15px #4fc3ff80 !important;
+  transition: all 0.1s;
+}
+
+.token-preview,
+.token-list {
+  background: #1b4a60;
+  padding: 10px;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #ffd966;
+  word-break: break-all;
+}
+
+.token {
+  display: inline-block;
+  padding: 2px 6px;
+  margin: 2px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.token.KEYWORD { background: #ffaa66; color: #000; }
+.token.IDENTIFIER { background: #88ff88; color: #000; }
+.token.NUMBER { background: #66ffaa; color: #000; }
+.token.STRING { background: #ff66aa; color: #000; }
+.token.OPERATOR { background: #66aaff; color: #000; }
+.token.PUNCTUATION { background: #ffaa66; color: #000; }
+.token.ERROR { background: #ff6666; color: #000; }
+
+/* Sorting Visualizer specific */
+.bars-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 300px;
+  background: #0b2a38;
+  border-radius: 8px;
+  padding: 10px;
+  gap: 2px;
+}
+
+.bar {
+  background: #4d9eff;
+  transition: height 0.05s ease;
+  min-width: 5px;
+}
+
+.bar.comparing {
+  background: #ffaa66;
+}
+
+.bar.sorted {
+  background: #88ff88;
+}
+
+/* Tree specific */
+.tree-values {
+  background: #1b4a60;
+  padding: 10px;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #ffd966;
+  word-break: break-all;
+}
+
+.search-area {
+  display: flex;
+  gap: 8px;
+}
+
+.search-area input {
+  flex: 1;
+}
+
+.search-result {
+  background: #1b4a60;
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+  color: #ffd966;
+}
+
+.fsm-info {
+  background: #1b4a60;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #b0d0ff;
+  line-height: 1.5;
+}
+
+.fsm-input {
+  display: flex;
+  gap: 8px;
+}
+
+.fsm-input input {
+  flex: 1;
+}
+
+.regex-examples {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.regex-examples button {
+  background: #225a88;
+  padding: 5px 10px;
+  font-size: 11px;
+}
+
+.info {
+  text-align: center;
+  color: #ffd966;
+  font-family: monospace;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .cs-module {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .cs-canvas {
+    width: 100%;
+    height: auto;
+  }
+  
+  .cs-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .cs-tab {
+    padding: 6px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .bars-container {
+    height: 200px;
+  }
+  
+  .token {
+    font-size: 9px;
+  }
+  
+  .regex-examples button {
+    font-size: 10px;
+  }
+}

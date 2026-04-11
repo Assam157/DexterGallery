@@ -1,43 +1,33 @@
-import React, { useState } from "react";
+ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-import AcidBaseIndicatorLab from "./AcidBaseIndicatorLab";
-
+import AcidBaseCylindricalPipeLab from "./AcidBaseIndicatorLab";
 import "./ChemLab.css";
 
 /* ================= GLOBAL CANVAS SIZE ================= */
-const GLOBAL_W = 1000;
+const GLOBAL_W = 1200;
 const GLOBAL_H = 920;
 
 export default function ChemLab() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState("indicator");
-  
+  const [mode, setMode] = useState("pipe");
 
   return (
     <div className="lab-root">
       {/* ================= LEFT PANEL ================= */}
       <div className="lab-panel">
         <div className="experiment-shell">
-
-          <button
-            className="panel-btn back-btn"
-            onClick={() => navigate("/")}
-          >
-            ← Back to Canvas
-          </button>
+          
 
           <div className="lab-panel-title">CHEMISTRY LAB</div>
 
           <button
-            className={`panel-btn ${mode === "indicator" ? "active" : ""}`}
-            onClick={() => setMode("indicator")}
+            className={`panel-btn ${mode === "pipe" ? "active" : ""}`}
+            onClick={() => setMode("pipe")}
           >
-            Acid–Base Indicator
+            🧪 Acid–Base Cylindrical Pipe
           </button>
 
-          
-
+           
         </div>
       </div>
 
@@ -46,12 +36,14 @@ export default function ChemLab() {
         <div
           className="global-canvas-frame"
           style={{
-            width: GLOBAL_W,
-            height: GLOBAL_H
+            width: GLOBAL_W*2,
+            height: GLOBAL_H*2,
+            overflow: "auto",
+            background: "linear-gradient(145deg, #0a0f1e 0%, #070b14 100%)"
           }}
         >
           <div className="global-canvas-scale">
-            {mode === "indicator" && <AcidBaseIndicatorLab />}
+            {mode === "pipe" && <AcidBaseCylindricalPipeLab />}
           </div>
         </div>
 
