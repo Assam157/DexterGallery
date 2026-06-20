@@ -1,10 +1,10 @@
 // components/robotics/PathPlanning.jsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import "./RoboticsSubLab.css";
 
 const PathPlanning = ({ mapSize, algorithm, obstacleDensity }) => {
   const canvasRef = useRef(null);
-  const [grid, setGrid] = useState([]);
+  const [grid, setGrid] = useState(null);   // start as null, not empty array
   const [path, setPath] = useState([]);
   const W = 700;
   const H = 450;
@@ -14,9 +14,12 @@ const PathPlanning = ({ mapSize, algorithm, obstacleDensity }) => {
 
   // Generate random obstacles
   useEffect(() => {
-    const newGrid = Array(mapSize).fill().map(() => Array(mapSize).fill(0));
+    if (!mapSize || mapSize <= 0) return;
+    const newGrid = Array(mapSize)
+      .fill()
+      .map(() => Array(mapSize).fill(0));
+
     const obstacleCount = Math.floor(mapSize * mapSize * obstacleDensity);
-    
     for (let i = 0; i < obstacleCount; i++) {
       const x = Math.floor(Math.random() * mapSize);
       const y = Math.floor(Math.random() * mapSize);
@@ -27,16 +30,55 @@ const PathPlanning = ({ mapSize, algorithm, obstacleDensity }) => {
     setGrid(newGrid);
   }, [mapSize, obstacleDensity]);
 
-  // A* Algorithm
-  const findPath = () => {
+  const heuristic = useCallback(
+    (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y),
+    []
+  );
+
+  const getNeighbors = useCallback(
+    (node) => {
+      const neighbors = [];
+      const dirs = [
+        [-1, 0],
+        [1, 0],
+        [0, -1],
+        [0, 1],
+      ];
+      for (const [dx, dy] of dirs) {
+        const x = node.x + dx;
+        const y = node.y + dy;
+        // Defensive check: ensure row exists before accessing column
+        if (
+          x >= 0 &&
+          x < mapSize &&
+          y >= 0 &&
+          y < mapSize &&
+          grid &&
+          grid[x] !== undefined &&
+          grid[x][y] !== 1
+        ) {
+          neighbors.push({ x, y });
+        }
+      }
+      return neighbors;
+    },
+    [mapSize, grid]
+  );
+
+  const findPath = useCallback(() => {
+    // Guard: grid must be ready and not empty
+    if (!grid || grid.length === 0 || grid.length !== mapSize) {
+      return [];
+    }
+
     const start = { x: 0, y: 0 };
     const goal = { x: mapSize - 1, y: mapSize - 1 };
-    
+
     const openSet = [start];
     const cameFrom = {};
     const gScore = {};
     const fScore = {};
-    
+
     for (let i = 0; i < mapSize; i++) {
       for (let j = 0; j < mapSize; j++) {
         gScore[`${i},${j}`] = Infinity;
@@ -45,10 +87,12 @@ const PathPlanning = ({ mapSize, algorithm, obstacleDensity }) => {
     }
     gScore[`${start.x},${start.y}`] = 0;
     fScore[`${start.x},${start.y}`] = heuristic(start, goal);
-    
+
     while (openSet.length > 0) {
-      let current = openSet.reduce((a, b) => fScore[`${a.x},${a.y}`] < fScore[`${b.x},${b.y}`] ? a : b);
-      
+      let current = openSet.reduce((a, b) =>
+        fScore[`${a.x},${a.y}`] < fScore[`${b.x},${b.y}`] ? a : b
+      );
+
       if (current.x === goal.x && current.y === goal.y) {
         const path = [];
         let curr = current;
@@ -59,63 +103,56 @@ const PathPlanning = ({ mapSize, algorithm, obstacleDensity }) => {
         path.unshift(start);
         return path;
       }
-      
-      const index = openSet.findIndex(p => p.x === current.x && p.y === current.y);
+
+      const index = openSet.findIndex(
+        (p) => p.x === current.x && p.y === current.y
+      );
       openSet.splice(index, 1);
-      
+
       const neighbors = getNeighbors(current);
       for (const neighbor of neighbors) {
         const tentativeG = gScore[`${current.x},${current.y}`] + 1;
         if (tentativeG < gScore[`${neighbor.x},${neighbor.y}`]) {
           cameFrom[`${neighbor.x},${neighbor.y}`] = current;
           gScore[`${neighbor.x},${neighbor.y}`] = tentativeG;
-          fScore[`${neighbor.x},${neighbor.y}`] = tentativeG + heuristic(neighbor, goal);
-          if (!openSet.some(p => p.x === neighbor.x && p.y === neighbor.y)) {
+          fScore[`${neighbor.x},${neighbor.y}`] =
+            tentativeG + heuristic(neighbor, goal);
+          if (
+            !openSet.some((p) => p.x === neighbor.x && p.y === neighbor.y)
+          ) {
             openSet.push(neighbor);
           }
         }
       }
     }
     return [];
-  };
+  }, [grid, mapSize, heuristic, getNeighbors]);
 
-  const heuristic = (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
-  
-  const getNeighbors = (node) => {
-    const neighbors = [];
-    const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-    for (const [dx, dy] of dirs) {
-      const x = node.x + dx;
-      const y = node.y + dy;
-      if (x >= 0 && x < mapSize && y >= 0 && y < mapSize && grid[x][y] !== 1) {
-        neighbors.push({ x, y });
-      }
-    }
-    return neighbors;
-  };
-
+  // Run pathfinding only when grid is ready
   useEffect(() => {
+    if (!grid || grid.length !== mapSize) return;
     const newPath = findPath();
     setPath(newPath);
-  }, [grid, algorithm]);
+  }, [grid, algorithm, findPath]);
 
+  // Canvas drawing
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     canvas.width = W;
     canvas.height = H;
 
     const draw = () => {
       ctx.clearRect(0, 0, W, H);
-      
+
       // Draw grid
       for (let i = 0; i < mapSize; i++) {
         for (let j = 0; j < mapSize; j++) {
           const x = offsetX + j * cellSize;
           const y = offsetY + i * cellSize;
-          
-          if (grid[i][j] === 1) {
+
+          if (grid && grid[i] && grid[i][j] === 1) {
             ctx.fillStyle = "#4a4a6a";
             ctx.fillRect(x, y, cellSize - 1, cellSize - 1);
           } else if (i === 0 && j === 0) {
@@ -128,14 +165,14 @@ const PathPlanning = ({ mapSize, algorithm, obstacleDensity }) => {
             ctx.fillStyle = "#1a1a3a";
             ctx.fillRect(x, y, cellSize - 1, cellSize - 1);
           }
-          
+
           ctx.strokeStyle = "#2a2a4a";
           ctx.strokeRect(x, y, cellSize - 1, cellSize - 1);
         }
       }
-      
+
       // Draw path
-      if (path.length > 0) {
+      if (path && path.length > 0) {
         ctx.beginPath();
         ctx.strokeStyle = "#ffd966";
         ctx.lineWidth = 3;
@@ -146,8 +183,7 @@ const PathPlanning = ({ mapSize, algorithm, obstacleDensity }) => {
           else ctx.lineTo(x, y);
         }
         ctx.stroke();
-        
-        // Draw path nodes
+
         for (const node of path) {
           const x = offsetX + node.y * cellSize + cellSize / 2;
           const y = offsetY + node.x * cellSize + cellSize / 2;
@@ -157,21 +193,22 @@ const PathPlanning = ({ mapSize, algorithm, obstacleDensity }) => {
           ctx.fill();
         }
       }
-      
-      // Draw algorithm label
+
       ctx.fillStyle = "#00ffff";
       ctx.font = "bold 12px monospace";
       ctx.fillText(`${algorithm.toUpperCase()} Path Planning`, 20, 30);
-      ctx.fillText(`Path Length: ${path.length} steps`, 20, 50);
+      ctx.fillText(`Path Length: ${path ? path.length : 0} steps`, 20, 50);
     };
-    
+
     draw();
   }, [grid, path, mapSize, cellSize, offsetX, offsetY, algorithm]);
 
   return (
     <div className="robotics-sub-lab">
       <canvas ref={canvasRef} className="robotics-canvas" />
-      <div className="robotics-sub-title">🗺️ Path Planning - {algorithm.toUpperCase()}</div>
+      <div className="robotics-sub-title">
+        🗺️ Path Planning - {algorithm.toUpperCase()}
+      </div>
     </div>
   );
 };
