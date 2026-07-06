@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+ import React, { useEffect, useRef } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -23,7 +23,7 @@ import DiodeBiasLab from "./components/PN-JunctionDiodeShwoing";
 import PNJunctionDiffusion from "./components/PNJunctionDIode"; 
 import CSLab from "./components/CSLab";
 import RoboticsLab from "./components/RoboticsAutomationLab"; // Add Robotics Lab
-
+import DiscoveryHub from "./components/DiscoveryHub";
 /* ==============================
    MAIN MENU
 ================================ */
@@ -110,6 +110,9 @@ function DexterHome() {
         case "=":  // Use = key for Robotics Lab
           navigate("/robotics");
           break;
+        case "]":
+          navigate("/discover");
+          break;
         default:
           break;
       }
@@ -172,6 +175,7 @@ function DexterHome() {
           ⬇ INSTALL DEXTERS LAB
         </button>
       )}
+      
 
       <button className="lab-btn" onClick={() => navigate("/radiation")}>
         ☢ Radiation Physics Lab
@@ -220,6 +224,12 @@ function DexterHome() {
       <button className="lab-btn" onClick={() => navigate("/robotics")}>
         🤖 Robotics & Automation Lab
       </button>
+      <button
+className="lab-btn"
+onClick={()=>navigate("/discover")}
+>
+🌌 Discovery Hub
+</button>
     </div>
   );
 }
@@ -233,6 +243,7 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<DexterHome />} />
+        <Route path="/discover" element={<DiscoveryHub/>}/>
         <Route path="/radiation" element={<RadiationPhysicsLab />} />
         <Route path="/optical" element={<OpticalDexterLab />} />
         <Route path="/semiconductor" element={<SemiconductorDexterLab />} />
