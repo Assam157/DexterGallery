@@ -1,0 +1,688 @@
+This interactive 3D simulation now lets you choose from several organism‑based presets, each with a distinct antibody structure, antigen shape, and binding arrangement. The microscopic‑view environment remains, and all previous controls still work.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Antibody-Antigen – Organism Presets | Microscopic View</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #0a1a2e 0%, #03060b 100%);
+        }
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0,0,0,0.65);
+            padding: 12px 25px;
+            border-radius: 30px;
+            pointer-events: none;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 10;
+        }
+        #preset-selector {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            background: rgba(10, 20, 35, 0.85);
+            padding: 12px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        #preset-selector label {
+            color: white;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        #preset-selector select {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+            outline: none;
+        }
+        #preset-selector select option {
+            background: #0a1a2e;
+            color: white;
+        }
+        #controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            background: rgba(10, 20, 35, 0.8);
+            padding: 12px 25px;
+            border-radius: 40px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.3);
+            z-index: 10;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .ctrl-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            white-space: nowrap;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .ctrl-btn:hover {
+            background: rgba(100, 180, 255, 0.3);
+            border-color: rgba(100, 200, 255, 0.7);
+            box-shadow: 0 0 20px rgba(70, 130, 255, 0.5);
+        }
+        .ctrl-btn.active {
+            background: #2a6fdb;
+            border-color: #5aa0ff;
+            box-shadow: 0 0 25px #2a6fdb;
+        }
+        #legend {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            background: rgba(0,0,0,0.65);
+            padding: 15px 25px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 10;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .legend-color {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 4px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @media (max-width: 850px) {
+            #preset-selector {
+                top: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                flex-direction: column;
+                gap: 8px;
+            }
+            #controls {
+                gap: 8px;
+                padding: 10px 15px;
+            }
+            .ctrl-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h2>🧬 Antibody • Antigen 3D Exploration</h2>
+        <p>Drag to rotate • Scroll to zoom • Right‑drag to pan</p>
+    </div>
+
+    <div id="preset-selector">
+        <label>🔬 Organism / Type:</label>
+        <select id="preset-dropdown">
+            <option value="human_igg_virus">Human IgG + Virus</option>
+            <option value="mouse_igg_bacteria">Mouse IgG + Bacteria</option>
+            <option value="rabbit_igg_toxin">Rabbit IgG + Toxin</option>
+            <option value="human_igm_pathogen">Human IgM (Pentamer) + Large Pathogen</option>
+            <option value="camelid_nanobody_hapten">Camelid Nanobody + Hapten</option>
+        </select>
+    </div>
+
+    <div id="legend">
+        <div><span class="legend-color" id="legend-antibody" style="background:#4da6ff;"></span> Antibody</div>
+        <div><span class="legend-color" id="legend-antigen" style="background:#ff6b6b;"></span> Antigen</div>
+        <div><span class="legend-color" style="background:#ffd93d;"></span> Binding interface</div>
+        <div style="margin-top:6px; font-size:12px; color:#aaa;">⚡ Select organism to change shape & placement</div>
+    </div>
+
+    <div id="controls">
+        <button id="btn-auto-rotate" class="ctrl-btn active">🌀 Auto‑Rotate</button>
+        <button id="btn-show-antigen" class="ctrl-btn active">🔴 Antigen Visible</button>
+        <button id="btn-wireframe" class="ctrl-btn">🔍 Wireframe</button>
+        <button id="btn-reset" class="ctrl-btn">↺ Reset View</button>
+        <button id="btn-move-antigen" class="ctrl-btn">↔ Move Antigen</button>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        class AntibodyAntigenScene {
+            constructor() {
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.labelRenderer = null;
+                this.controls = null;
+                this.antibodyGroup = null;
+                this.antigenGroup = null;
+                this.interfaceGroup = null;
+                this.labels = [];
+                this.clock = new THREE.Clock();
+                this.autoRotate = true;
+                this.antigenVisible = true;
+                this.wireframeMode = false;
+                this.moveAntigenMode = false;
+                this.antigenOffset = new THREE.Vector3(0, 0, 0);
+                this.targetAntigenOffset = new THREE.Vector3(0, 0, 0);
+                this.currentPreset = 'human_igg_virus';
+            }
+
+            Init() {
+                this._SetupRenderer();
+                this._SetupScene();
+                this._SetupCamera();
+                this._SetupLighting();
+                this._SetupControls();
+                this._AddMicroscopeGrid();
+                this._LoadPreset(this.currentPreset);
+                this._StartAnimationLoop();
+                window.addEventListener('resize', () => this._OnWindowResize());
+            }
+
+            _SetupRenderer() {
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                this.renderer.setClearColor(0x06121c, 1.0);
+                document.body.appendChild(this.renderer.domElement);
+
+                this.labelRenderer = new CSS2DRenderer();
+                this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
+                this.labelRenderer.domElement.style.position = 'absolute';
+                this.labelRenderer.domElement.style.top = '0px';
+                this.labelRenderer.domElement.style.pointerEvents = 'none';
+                document.body.appendChild(this.labelRenderer.domElement);
+            }
+
+            _SetupScene() {
+                this.scene = new THREE.Scene();
+                this.scene.fog = new THREE.FogExp2(0x06121c, 0.00008);
+            }
+
+            _SetupCamera() {
+                this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.camera.position.set(8, 4, 12);
+                this.camera.lookAt(0, 0, 0);
+            }
+
+            _SetupLighting() {
+                const ambient = new THREE.AmbientLight(0x304060);
+                this.scene.add(ambient);
+                const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+                keyLight.position.set(10, 15, 10);
+                keyLight.castShadow = true;
+                keyLight.shadow.mapSize.width = 1024;
+                keyLight.shadow.mapSize.height = 1024;
+                keyLight.shadow.camera.near = 0.5;
+                keyLight.shadow.camera.far = 50;
+                this.scene.add(keyLight);
+                const fillLight = new THREE.DirectionalLight(0x6688cc, 0.6);
+                fillLight.position.set(-10, 0, -5);
+                this.scene.add(fillLight);
+                const rimLight = new THREE.DirectionalLight(0xffaa88, 0.7);
+                rimLight.position.set(0, -2, 10);
+                this.scene.add(rimLight);
+                const pointLight = new THREE.PointLight(0x4488ff, 0.5, 20);
+                pointLight.position.set(2, 3, 4);
+                this.scene.add(pointLight);
+            }
+
+            _SetupControls() {
+                this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+                this.controls.enableDamping = true;
+                this.controls.dampingFactor = 0.05;
+                this.controls.rotateSpeed = 0.8;
+                this.controls.zoomSpeed = 1.5;
+                this.controls.panSpeed = 0.8;
+                this.controls.autoRotate = this.autoRotate;
+                this.controls.autoRotateSpeed = 0.8;
+                this.controls.target.set(0, 0, 0);
+                this.controls.update();
+            }
+
+            _AddMicroscopeGrid() {
+                const gridHelper = new THREE.GridHelper(8, 30, 0x1a4c7a, 0x0a1a2e);
+                gridHelper.position.y = -3.2;
+                gridHelper.material.opacity = 0.25;
+                gridHelper.material.transparent = true;
+                this.scene.add(gridHelper);
+                const ringGeo = new THREE.TorusGeometry(3.5, 0.03, 16, 64);
+                const ringMat = new THREE.MeshStandardMaterial({ color: 0x2a5a8c, emissive: new THREE.Color(0x051525), roughness: 0.7, metalness: 0.4 });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.position.y = -3.2;
+                ring.rotation.x = Math.PI / 2;
+                this.scene.add(ring);
+            }
+
+            // --- Preset loading ---
+            _LoadPreset(presetKey) {
+                // Clear previous models
+                if (this.antibodyGroup) this.scene.remove(this.antibodyGroup);
+                if (this.antigenGroup) this.scene.remove(this.antigenGroup);
+                if (this.interfaceGroup) this.scene.remove(this.interfaceGroup);
+                this.labels.forEach(l => this.scene.remove(l));
+                this.labels = [];
+
+                this.antibodyGroup = new THREE.Group();
+                this.antigenGroup = new THREE.Group();
+                this.interfaceGroup = new THREE.Group();
+
+                // Reset offsets
+                this.antigenOffset.set(0,0,0);
+                this.targetAntigenOffset.set(0,0,0);
+
+                // Build according to preset
+                switch(presetKey) {
+                    case 'human_igg_virus':
+                        this._buildHumanIgG();
+                        this._buildVirusAntigen();
+                        this._addBindingInterface(new THREE.Vector3(0, -0.6, 0.8), 0.5);
+                        this._addLabel('Human IgG', new THREE.Vector3(0, 1.8, 0), '#4da6ff');
+                        this._addLabel('Influenza Virus', new THREE.Vector3(0, -1.8, 1.2), '#ff6b6b');
+                        document.getElementById('legend-antibody').style.background = '#4da6ff';
+                        document.getElementById('legend-antigen').style.background = '#ff6b6b';
+                        break;
+                    case 'mouse_igg_bacteria':
+                        this._buildMouseIgG();
+                        this._buildBacteriaAntigen();
+                        this._addBindingInterface(new THREE.Vector3(0, -0.7, 0.9), 0.6);
+                        this._addLabel('Mouse IgG', new THREE.Vector3(0, 1.6, 0), '#66cc88');
+                        this._addLabel('E. coli (Bacteria)', new THREE.Vector3(0, -2.0, 1.4), '#88cc44');
+                        document.getElementById('legend-antibody').style.background = '#66cc88';
+                        document.getElementById('legend-antigen').style.background = '#88cc44';
+                        break;
+                    case 'rabbit_igg_toxin':
+                        this._buildRabbitIgG();
+                        this._buildToxinAntigen();
+                        this._addBindingInterface(new THREE.Vector3(0, -0.5, 0.7), 0.4);
+                        this._addLabel('Rabbit IgG', new THREE.Vector3(0, 1.7, 0), '#cc88ff');
+                        this._addLabel('Toxin Protein', new THREE.Vector3(0, -1.6, 1.0), '#ffaa88');
+                        document.getElementById('legend-antibody').style.background = '#cc88ff';
+                        document.getElementById('legend-antigen').style.background = '#ffaa88';
+                        break;
+                    case 'human_igm_pathogen':
+                        this._buildHumanIgM();
+                        this._buildLargePathogenAntigen();
+                        this._addBindingInterface(new THREE.Vector3(0, -1.0, 0.6), 1.2);
+                        this._addLabel('Human IgM (pentamer)', new THREE.Vector3(0, 1.2, 0), '#ffaa00');
+                        this._addLabel('Large Pathogen', new THREE.Vector3(0, -2.5, 2.0), '#ff5555');
+                        document.getElementById('legend-antibody').style.background = '#ffaa00';
+                        document.getElementById('legend-antigen').style.background = '#ff5555';
+                        break;
+                    case 'camelid_nanobody_hapten':
+                        this._buildNanobody();
+                        this._buildHaptenAntigen();
+                        this._addBindingInterface(new THREE.Vector3(0, -0.2, 0.5), 0.2);
+                        this._addLabel('Nanobody (VHH)', new THREE.Vector3(0, 1.0, 0), '#44ddbb');
+                        this._addLabel('Hapten (small molecule)', new THREE.Vector3(0, -0.8, 0.8), '#dd8844');
+                        document.getElementById('legend-antibody').style.background = '#44ddbb';
+                        document.getElementById('legend-antigen').style.background = '#dd8844';
+                        break;
+                }
+
+                this.scene.add(this.antibodyGroup);
+                this.scene.add(this.antigenGroup);
+                this.scene.add(this.interfaceGroup);
+                this.antigenGroup.position.copy(this.antigenOffset); // will be updated in loop
+            }
+
+            // --- Antibody builders ---
+            _buildHumanIgG() {
+                const group = this.antibodyGroup;
+                const mat = new THREE.MeshPhongMaterial({ color: 0x4da6ff, specular: 0x222222, shininess: 30, transparent: true, opacity: 0.9 });
+                const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.3, 2.5, 12), mat);
+                stem.position.y = -1.25;
+                stem.castShadow = stem.receiveShadow = true;
+                group.add(stem);
+                const hinge = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16), new THREE.MeshPhongMaterial({ color: 0x3d8ce6, specular: 0x333333, shininess: 40 }));
+                hinge.position.y = 0.1;
+                hinge.castShadow = hinge.receiveShadow = true;
+                group.add(hinge);
+                this._createArm(group, -0.8, 0.3, 0.7, 1.6, -0.3, 0x4da6ff);
+                this._createArm(group, 0.8, 0.3, -0.7, 1.6, -0.3, 0x4da6ff);
+                this._addDomain(group, -1.2, 1.5, 0.5, 0.35, 0x5db8fe);
+                this._addDomain(group, 1.2, 1.5, -0.5, 0.35, 0x5db8fe);
+                this._addDomain(group, -0.5, 1.9, 0.4, 0.3, 0x6bc0ff);
+                this._addDomain(group, 0.5, 1.9, -0.4, 0.3, 0x6bc0ff);
+            }
+
+            _buildMouseIgG() {
+                const group = this.antibodyGroup;
+                const mat = new THREE.MeshPhongMaterial({ color: 0x66cc88, specular: 0x224422, shininess: 30, transparent: true, opacity: 0.9 });
+                const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.28, 2.3, 12), mat);
+                stem.position.y = -1.15;
+                stem.castShadow = stem.receiveShadow = true;
+                group.add(stem);
+                const hinge = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16), new THREE.MeshPhongMaterial({ color: 0x55aa77, specular: 0x333333, shininess: 40 }));
+                hinge.position.y = 0.1;
+                hinge.castShadow = hinge.receiveShadow = true;
+                group.add(hinge);
+                this._createArm(group, -0.7, 0.3, 0.6, 1.5, -0.25, 0x66cc88);
+                this._createArm(group, 0.7, 0.3, -0.6, 1.5, -0.25, 0x66cc88);
+                this._addDomain(group, -1.0, 1.4, 0.4, 0.3, 0x77dd99);
+                this._addDomain(group, 1.0, 1.4, -0.4, 0.3, 0x77dd99);
+            }
+
+            _buildRabbitIgG() {
+                const group = this.antibodyGroup;
+                const mat = new THREE.MeshPhongMaterial({ color: 0xcc88ff, specular: 0x442244, shininess: 30, transparent: true, opacity: 0.9 });
+                const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.29, 2.4, 12), mat);
+                stem.position.y = -1.2;
+                stem.castShadow = stem.receiveShadow = true;
+                group.add(stem);
+                const hinge = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16), new THREE.MeshPhongMaterial({ color: 0xbb77ee, specular: 0x333333, shininess: 40 }));
+                hinge.position.y = 0.1;
+                hinge.castShadow = hinge.receiveShadow = true;
+                group.add(hinge);
+                this._createArm(group, -0.75, 0.3, 0.65, 1.55, -0.28, 0xcc88ff);
+                this._createArm(group, 0.75, 0.3, -0.65, 1.55, -0.28, 0xcc88ff);
+                this._addDomain(group, -1.1, 1.45, 0.45, 0.33, 0xddaaff);
+                this._addDomain(group, 1.1, 1.45, -0.45, 0.33, 0xddaaff);
+            }
+
+            _buildHumanIgM() {
+                // Pentamer: five Y-shaped units arranged in a ring
+                const group = this.antibodyGroup;
+                const baseColor = 0xffaa00;
+                const mat = new THREE.MeshPhongMaterial({ color: baseColor, specular: 0x333322, shininess: 30, transparent: true, opacity: 0.9 });
+                const centerStem = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.4, 1.8, 12), mat);
+                centerStem.position.y = -0.9;
+                centerStem.castShadow = centerStem.receiveShadow = true;
+                group.add(centerStem);
+                const hub = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16), new THREE.MeshPhongMaterial({ color: 0xee9900, specular: 0x333333, shininess: 40 }));
+                hub.position.y = 0.1;
+                hub.castShadow = hub.receiveShadow = true;
+                group.add(hub);
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i / 5) * Math.PI * 2;
+                    const dx = Math.cos(angle) * 0.9;
+                    const dz = Math.sin(angle) * 0.9;
+                    const armGroup = new THREE.Group();
+                    armGroup.position.set(dx, 0.2, dz);
+                    armGroup.rotation.z = 0.2;
+                    armGroup.rotation.y = angle;
+                    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.18, 1.4, 10), mat);
+                    arm.position.y = 0.7;
+                    arm.castShadow = arm.receiveShadow = true;
+                    armGroup.add(arm);
+                    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8), new THREE.MeshPhongMaterial({ color: 0xffbb33, specular: 0x333333 }));
+                    tip.position.y = 1.5;
+                    tip.castShadow = tip.receiveShadow = true;
+                    armGroup.add(tip);
+                    group.add(armGroup);
+                }
+            }
+
+            _buildNanobody() {
+                const group = this.antibodyGroup;
+                const mat = new THREE.MeshPhongMaterial({ color: 0x44ddbb, specular: 0x224444, shininess: 40, transparent: true, opacity: 0.9 });
+                const body = new THREE.Mesh(new THREE.SphereGeometry(0.45, 16), mat);
+                body.position.y = 0.2;
+                body.castShadow = body.receiveShadow = true;
+                group.add(body);
+                const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.15, 1.0, 8), mat);
+                arm.position.set(0, 0.8, 0.3);
+                arm.rotation.x = 0.3;
+                arm.castShadow = arm.receiveShadow = true;
+                group.add(arm);
+                const tip = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8), new THREE.MeshPhongMaterial({ color: 0x66ffdd }));
+                tip.position.set(0, 1.3, 0.45);
+                tip.castShadow = tip.receiveShadow = true;
+                group.add(tip);
+            }
+
+            _createArm(group, x, y, zDir, length, angle, color) {
+                const armGroup = new THREE.Group();
+                armGroup.position.set(x, y, 0);
+                const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, length, 10), new THREE.MeshPhongMaterial({ color, specular: 0x222222, shininess: 30 }));
+                arm.position.y = length/2;
+                arm.castShadow = arm.receiveShadow = true;
+                armGroup.add(arm);
+                armGroup.rotation.z = angle;
+                armGroup.rotation.x = zDir * 0.2;
+                group.add(armGroup);
+            }
+
+            _addDomain(group, x, y, z, radius, color) {
+                const domain = new THREE.Mesh(new THREE.SphereGeometry(radius, 16), new THREE.MeshPhongMaterial({ color, specular: 0x444444, shininess: 35 }));
+                domain.position.set(x, y, z);
+                domain.castShadow = domain.receiveShadow = true;
+                group.add(domain);
+            }
+
+            // --- Antigen builders ---
+            _buildVirusAntigen() {
+                const group = this.antigenGroup;
+                const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.65, 2), new THREE.MeshPhongMaterial({ color: 0xff6b6b, specular: 0x552222, shininess: 40 }));
+                core.castShadow = core.receiveShadow = true;
+                group.add(core);
+                for (let i = 0; i < 25; i++) {
+                    const spike = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.3, 6), new THREE.MeshPhongMaterial({ color: 0xff8888 }));
+                    spike.position.setFromSpherical(new THREE.Spherical(0.75, Math.random()*Math.PI, Math.random()*Math.PI*2));
+                    spike.lookAt(new THREE.Vector3(0,0,0));
+                    spike.rotateX(Math.PI/2);
+                    spike.castShadow = true;
+                    group.add(spike);
+                }
+                group.position.set(0, -0.8, 1.2);
+            }
+
+            _buildBacteriaAntigen() {
+                const group = this.antigenGroup;
+                const rod = new THREE.Mesh(new THREE.CapsuleGeometry(0.4, 1.2, 8, 12), new THREE.MeshPhongMaterial({ color: 0x88cc44, specular: 0x335522, shininess: 25 }));
+                rod.castShadow = rod.receiveShadow = true;
+                group.add(rod);
+                for (let i = 0; i < 12; i++) {
+                    const pili = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.25, 6), new THREE.MeshPhongMaterial({ color: 0xaadd66 }));
+                    pili.position.set((Math.random()-0.5)*0.8, (Math.random()-0.5)*1.5, (Math.random()-0.5)*0.8);
+                    pili.castShadow = true;
+                    group.add(pili);
+                }
+                group.position.set(0, -1.0, 1.4);
+            }
+
+            _buildToxinAntigen() {
+                const group = this.antigenGroup;
+                const blob = new THREE.Mesh(new THREE.DodecahedronGeometry(0.5, 1), new THREE.MeshPhongMaterial({ color: 0xffaa88, specular: 0x442211, shininess: 30 }));
+                blob.castShadow = blob.receiveShadow = true;
+                group.add(blob);
+                for (let i = 0; i < 6; i++) {
+                    const bump = new THREE.Mesh(new THREE.SphereGeometry(0.18, 6), new THREE.MeshPhongMaterial({ color: 0xffbb99 }));
+                    bump.position.set((Math.random()-0.5)*0.8, (Math.random()-0.5)*0.8, (Math.random()-0.5)*0.8);
+                    bump.castShadow = true;
+                    group.add(bump);
+                }
+                group.position.set(0, -0.7, 1.0);
+            }
+
+            _buildLargePathogenAntigen() {
+                const group = this.antigenGroup;
+                const core = new THREE.Mesh(new THREE.SphereGeometry(1.0, 16), new THREE.MeshPhongMaterial({ color: 0xff5555, specular: 0x552222, shininess: 30 }));
+                core.castShadow = core.receiveShadow = true;
+                group.add(core);
+                for (let i = 0; i < 30; i++) {
+                    const prot = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.4, 6), new THREE.MeshPhongMaterial({ color: 0xff7777 }));
+                    prot.position.setFromSpherical(new THREE.Spherical(1.1, Math.random()*Math.PI, Math.random()*Math.PI*2));
+                    prot.lookAt(new THREE.Vector3(0,0,0));
+                    prot.rotateX(Math.PI/2);
+                    prot.castShadow = true;
+                    group.add(prot);
+                }
+                group.position.set(0, -1.5, 2.0);
+            }
+
+            _buildHaptenAntigen() {
+                const group = this.antigenGroup;
+                const small = new THREE.Mesh(new THREE.OctahedronGeometry(0.25), new THREE.MeshPhongMaterial({ color: 0xdd8844, specular: 0x442211 }));
+                small.castShadow = small.receiveShadow = true;
+                group.add(small);
+                group.position.set(0, -0.5, 0.8);
+            }
+
+            _addBindingInterface(position, radiusScale) {
+                const group = this.interfaceGroup;
+                while(group.children.length > 0) group.remove(group.children[0]);
+                const count = 20;
+                for (let i = 0; i < count; i++) {
+                    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.05, 4), new THREE.MeshBasicMaterial({ color: 0xffd93d }));
+                    const angle = (i / count) * Math.PI * 2;
+                    dot.position.set(Math.cos(angle) * radiusScale, Math.sin(angle) * radiusScale*0.6, 0);
+                    group.add(dot);
+                }
+                group.position.copy(position);
+            }
+
+            _addLabel(text, pos, color) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                div.style.color = color;
+                div.style.fontSize = '16px';
+                div.style.fontWeight = 'bold';
+                div.style.textShadow = '1px 1px 3px black';
+                const label = new CSS2DObject(div);
+                label.position.copy(pos);
+                this.scene.add(label);
+                this.labels.push(label);
+            }
+
+            // --- Animation and UI ---
+            _StartAnimationLoop() {
+                const animate = () => {
+                    requestAnimationFrame(animate);
+                    const delta = this.clock.getDelta();
+                    this._Update(delta);
+                    this.controls.update();
+                    this.renderer.render(this.scene, this.camera);
+                    this.labelRenderer.render(this.scene, this.camera);
+                };
+                animate();
+            }
+
+            _Update(delta) {
+                if (this.moveAntigenMode && this.antigenGroup) {
+                    this.targetAntigenOffset.x = Math.sin(Date.now() * 0.001) * 0.5;
+                    this.targetAntigenOffset.y = Math.cos(Date.now() * 0.0013) * 0.3;
+                    this.targetAntigenOffset.z = Math.cos(Date.now() * 0.0008) * 0.4;
+                } else {
+                    this.targetAntigenOffset.set(0,0,0);
+                }
+                this.antigenOffset.lerp(this.targetAntigenOffset, 0.05);
+                if (this.antigenGroup) {
+                    this.antigenGroup.position.copy(this.antigenOffset);
+                }
+                if (this.antibodyGroup && !this.moveAntigenMode) {
+                    this.antibodyGroup.scale.setScalar(1 + Math.sin(Date.now() * 0.002) * 0.01);
+                }
+            }
+
+            _OnWindowResize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
+            }
+
+            ToggleAutoRotate() { this.autoRotate = !this.autoRotate; this.controls.autoRotate = this.autoRotate; }
+            ToggleAntigenVisibility() { this.antigenVisible = !this.antigenVisible; if(this.antigenGroup) this.antigenGroup.visible = this.antigenVisible; }
+            ToggleWireframe() { this.wireframeMode = !this.wireframeMode; this._setWireframeRecursive(this.scene, this.wireframeMode); }
+            _setWireframeRecursive(obj, wf) {
+                if (obj.material) {
+                    if (Array.isArray(obj.material)) obj.material.forEach(m => { if(m.wireframe!==undefined) m.wireframe = wf; });
+                    else if (obj.material.wireframe !== undefined) obj.material.wireframe = wf;
+                }
+                if (obj.children) obj.children.forEach(c => this._setWireframeRecursive(c, wf));
+            }
+            ResetView() {
+                this.camera.position.set(8,4,12);
+                this.controls.target.set(0,0,0);
+                this.controls.update();
+                this.antigenOffset.set(0,0,0);
+                this.targetAntigenOffset.set(0,0,0);
+                if(this.antigenGroup) this.antigenGroup.position.copy(this.antigenOffset);
+                this.autoRotate = true;
+                this.controls.autoRotate = true;
+                this.moveAntigenMode = false;
+                document.getElementById('btn-auto-rotate').classList.add('active');
+                document.getElementById('btn-move-antigen').classList.remove('active');
+            }
+            ToggleMoveAntigen() { this.moveAntigenMode = !this.moveAntigenMode; if(!this.moveAntigenMode) this.targetAntigenOffset.set(0,0,0); }
+        }
+
+        // --- Bootstrap ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const app = new AntibodyAntigenScene();
+            app.Init();
+
+            document.getElementById('btn-auto-rotate').addEventListener('click', (e) => { app.ToggleAutoRotate(); e.target.classList.toggle('active'); });
+            document.getElementById('btn-show-antigen').addEventListener('click', (e) => {
+                app.ToggleAntigenVisibility();
+                e.target.classList.toggle('active');
+                e.target.textContent = app.antigenVisible ? '🔴 Antigen Visible' : '🔴 Antigen Hidden';
+            });
+            document.getElementById('btn-wireframe').addEventListener('click', (e) => { app.ToggleWireframe(); e.target.classList.toggle('active'); });
+            document.getElementById('btn-reset').addEventListener('click', () => app.ResetView());
+            document.getElementById('btn-move-antigen').addEventListener('click', (e) => { app.ToggleMoveAntigen(); e.target.classList.toggle('active'); });
+
+            // Preset dropdown
+            const dropdown = document.getElementById('preset-dropdown');
+            dropdown.addEventListener('change', (e) => {
+                const newPreset = e.target.value;
+                app.currentPreset = newPreset;
+                app._LoadPreset(newPreset);
+                // Reset view orientation slightly to fit new scene? Optionally reset camera.
+                app.camera.position.set(8,4,12);
+                app.controls.target.set(0,0,0);
+                app.controls.update();
+            });
+
+            console.log('🔬 Organism-based Antibody-Antigen Presets Ready');
+        });
+    </script>
+</body>
+</html>
+```
