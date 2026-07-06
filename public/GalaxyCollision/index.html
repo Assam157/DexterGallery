@@ -1,0 +1,379 @@
+ <!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>🌌 Milkomeda Collision Simulator</title>
+
+<style>
+
+html,
+body{
+
+    margin:0;
+    overflow:hidden;
+    background:#000;
+    font-family:Arial,sans-serif;
+
+}
+
+/*************************************************
+                Title
+*************************************************/
+
+#title{
+
+    position:absolute;
+
+    top:20px;
+
+    width:100%;
+
+    text-align:center;
+
+    color:white;
+
+    font-size:28px;
+
+    letter-spacing:6px;
+
+    pointer-events:none;
+
+    text-shadow:
+    0 0 15px rgba(255,255,255,.5);
+
+}
+
+/*************************************************
+                Timeline Panel
+*************************************************/
+
+#ui{
+
+    position:absolute;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    bottom:25px;
+
+    width:460px;
+
+    padding:18px 24px;
+
+    border-radius:22px;
+
+    background:rgba(15,20,35,.45);
+
+    backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    box-shadow:
+
+    0 0 35px rgba(0,0,0,.75),
+
+    inset 0 0 30px rgba(255,255,255,.03);
+
+}
+
+/*************************************************
+*************************************************/
+
+#timelineTitle{
+
+    text-align:center;
+
+    color:#b9d7ff;
+
+    font-size:11px;
+
+    letter-spacing:4px;
+
+    margin-bottom:12px;
+
+}
+
+/*************************************************
+*************************************************/
+
+#time{
+
+    width:100%;
+
+    appearance:none;
+
+    background:transparent;
+
+}
+
+/*************************************************
+*************************************************/
+
+#time::-webkit-slider-runnable-track{
+
+    height:5px;
+
+    border-radius:999px;
+
+    background:
+
+    linear-gradient(
+
+        90deg,
+
+        #4ea2ff,
+
+        #ffffff,
+
+        #ffd090,
+
+        #cc88ff
+
+    );
+
+}
+
+/*************************************************
+*************************************************/
+
+#time::-webkit-slider-thumb{
+
+    appearance:none;
+
+    width:18px;
+
+    height:18px;
+
+    border-radius:50%;
+
+    background:white;
+
+    margin-top:-6px;
+
+    box-shadow:
+
+    0 0 12px white,
+
+    0 0 25px white;
+
+}
+
+/*************************************************
+*************************************************/
+
+.ticks{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-top:10px;
+
+    font-size:10px;
+
+    color:rgba(255,255,255,.45);
+
+    letter-spacing:1px;
+
+}
+
+/*************************************************
+*************************************************/
+
+#label{
+
+    margin-top:14px;
+
+    text-align:center;
+
+    color:white;
+
+    font-size:15px;
+
+}
+
+/*************************************************
+*************************************************/
+
+#event{
+
+    margin-top:6px;
+
+    text-align:center;
+
+    color:#8fd8ff;
+
+    font-size:12px;
+
+    letter-spacing:2px;
+
+}
+
+/*************************************************
+                Controls
+*************************************************/
+
+#controls{
+
+    position:absolute;
+
+    top:20px;
+
+    left:20px;
+
+    color:white;
+
+    background:rgba(0,0,0,.55);
+
+    padding:16px;
+
+    border-radius:16px;
+
+    line-height:1.7;
+
+    font-size:14px;
+
+}
+
+/*************************************************
+*************************************************/
+
+kbd{
+
+    background:#333;
+
+    border-radius:5px;
+
+    padding:2px 7px;
+
+    font-size:13px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="title">
+
+MILKY WAY × ANDROMEDA
+
+</div>
+
+<div id="controls">
+
+<b>Controls</b>
+
+<br><br>
+
+<kbd>A</kbd> /
+<kbd>←</kbd>
+Previous
+
+<br>
+
+<kbd>D</kbd> /
+<kbd>→</kbd>
+Next
+
+<br>
+
+<kbd>P</kbd>
+Play / Pause
+
+<br>
+
+<kbd>R</kbd>
+Reset
+
+<br>
+
+<kbd>SPACE</kbd>
+Pause Timeline
+
+</div>
+
+<div id="ui">
+
+<div id="timelineTitle">
+
+GALACTIC TIMELINE
+
+</div>
+
+<input
+
+id="time"
+
+type="range"
+
+min="0"
+
+max="7"
+
+step="0.001"
+
+value="0">
+
+<div class="ticks">
+
+<span>NOW</span>
+
+<span>FIRST PASS</span>
+
+<span>BRIDGE</span>
+
+<span>MERGER</span>
+
+<span>MILKOMEDA</span>
+
+</div>
+
+<div id="label">
+
+0.00 Billion Years
+
+</div>
+
+<div id="event">
+
+Present Day
+
+</div>
+
+</div>
+
+<!-- Import Map -->
+
+<script type="importmap">
+{
+    "imports":{
+
+        "three":"https://unpkg.com/three@0.159.0/build/three.module.js",
+
+        "three/addons/":"https://unpkg.com/three@0.159.0/examples/jsm/"
+
+    }
+}
+</script>
+
+<!-- Main Application -->
+
+<script
+type="module"
+src="./app.js">
+</script>
+
+</body>
+
+</html>

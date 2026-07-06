@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Milkomeda Collision Fixed</title>
+<style>
+html,body{margin:0;overflow:hidden;background:#000;font-family:Arial,sans-serif}
+#title{position:absolute;top:25px;width:100%;text-align:center;color:#fff;letter-spacing:6px;font-size:26px;pointer-events:none}
+#ui{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:25px;
+
+    width:420px;
+
+    padding:16px 22px;
+
+    background:rgba(10,15,30,.45);
+
+    backdrop-filter:blur(18px);
+
+    border-radius:24px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    box-shadow:
+    0 0 40px rgba(0,0,0,.7),
+    inset 0 0 30px rgba(255,255,255,.03);
+
+    transition:.4s;
+
+    opacity:.35;
+}
+
+#ui:hover{
+    opacity:1;
+}
+
+#timelineTitle{
+    text-align:center;
+    color:#b9d7ff;
+    letter-spacing:3px;
+    font-size:10px;
+    margin-bottom:12px;
+}
+
+#time{
+    width:100%;
+    appearance:none;
+    background:transparent;
+}
+
+#time::-webkit-slider-runnable-track{
+
+    height:5px;
+
+    border-radius:999px;
+
+    background:
+    linear-gradient(
+        90deg,
+        #4e9cff 0%,
+        #ffffff 45%,
+        #ffd28d 70%,
+        #b56cff 100%
+    );
+
+    box-shadow:
+    0 0 15px rgba(255,255,255,.2);
+}
+
+#time::-webkit-slider-thumb{
+
+    appearance:none;
+
+    width:18px;
+    height:18px;
+
+    border-radius:50%;
+
+    background:white;
+
+    margin-top:-6px;
+
+    box-shadow:
+    0 0 10px white,
+    0 0 30px white,
+    0 0 60px rgba(255,255,255,.7);
+}
+
+.ticks{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-top:8px;
+
+    color:rgba(255,255,255,.45);
+
+    font-size:9px;
+
+    letter-spacing:1px;
+}
+
+#label{
+    margin-top:14px;
+
+    text-align:center;
+
+    color:white;
+
+    font-size:14px;
+
+    letter-spacing:1px;
+}
+
+#event{
+
+    margin-top:6px;
+
+    text-align:center;
+
+    color:#8fc7ff;
+
+    font-size:11px;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+}
+#label,#event{color:#fff;text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+
+<div id="title">MILKY WAY × ANDROMEDA</div>
+
+<div id="ui">
+
+    <div id="timelineTitle">
+        GALACTIC TIMELINE
+    </div>
+
+    <input id="time" type="range"
+           min="0"
+           max="7"
+           step="0.01"
+           value="0">
+
+    <div class="ticks">
+        <span>NOW</span>
+        <span>FIRST PASS</span>
+        <span>MERGER</span>
+        <span>MILKOMEDA</span>
+    </div>
+
+    <div id="label">0.00 Billion Years</div>
+    <div id="event">Present Day</div>
+
+</div>
+
+<script src="https://unpkg.com/three@0.159.0/build/three.min.js"></script>
+<script>
+const scene=new THREE.Scene();
+
+const camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,1,10000);
+camera.position.set(0,150,700);
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+window.addEventListener('resize',()=>{
+camera.aspect=window.innerWidth/window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(window.innerWidth,window.innerHeight);
+});
+
+scene.add(new THREE.AmbientLight(0xffffff,1.2));
+
+function createGalaxy(color,count,radius,arms){
+const positions=new Float32Array(count*3);
+const colors=new Float32Array(count*3);
+const c=new THREE.Color(color);
+
+for(let i=0;i<count;i++){
+const arm=i%arms;
+const r=Math.pow(Math.random(),2.0)*radius;
+const angle=(arm/arms)*Math.PI*2+r*0.12+(Math.random()-0.5)*0.5;
+
+positions[i*3]=Math.cos(angle)*r;
+positions[i*3+1]=(Math.random()-0.5)*8;
+positions[i*3+2]=Math.sin(angle)*r;
+
+colors[i*3]=c.r;
+colors[i*3+1]=c.g;
+colors[i*3+2]=c.b;
+}
+
+const geo=new THREE.BufferGeometry();
+geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+geo.setAttribute('color',new THREE.BufferAttribute(colors,3));
+
+const mat=new THREE.PointsMaterial({
+size:1.6,
+vertexColors:true,
+transparent:true,
+depthWrite:false,
+blending:THREE.AdditiveBlending
+});
+
+const pts=new THREE.Points(geo,mat);
+pts.userData.original=positions.slice();
+return pts;
+}
+
+const mw=createGalaxy(0x88bbff,40000,120,4);
+const andr=createGalaxy(0xffd099,40000,130,5);
+const remnant=createGalaxy(0xbb77ff,70000,200,1);
+
+mw.rotation.x=1.0;
+andr.rotation.x=-0.7;
+remnant.material.opacity=0;
+
+scene.add(mw);
+scene.add(andr);
+scene.add(remnant);
+
+const flash=new THREE.PointLight(0xffffff,0,3000);
+scene.add(flash);
+
+const slider=document.getElementById('time');
+const label=document.getElementById('label');
+const eventLabel=document.getElementById('event');
+
+function update(t){
+
+label.textContent=t.toFixed(2)+' Billion Years';
+
+if(t<2) eventLabel.textContent='APPROACH';
+else if(t<4) eventLabel.textContent='FIRST IMPACT';
+else if(t<6) eventLabel.textContent='MERGER';
+else eventLabel.textContent='MILKOMEDA';
+
+const p=t/7;
+
+let z= p<0.55 ? THREE.MathUtils.lerp(900,0,p/0.55) : 0;
+
+mw.position.z=-z;
+andr.position.z=z;
+
+const merge=THREE.MathUtils.clamp((p-0.6)/0.4,0,1);
+
+mw.material.opacity=1-merge;
+andr.material.opacity=1-merge;
+
+remnant.material.opacity=merge;
+remnant.scale.setScalar(0.2+merge*2.5);
+
+flash.intensity=(p>0.45&&p<0.62)?20:0;
+}
+
+slider.addEventListener('input',e=>update(parseFloat(e.target.value)));
+let moveLeft = false;
+let moveRight = false;
+
+window.addEventListener('keydown',(e)=>{
+
+    if(e.key.toLowerCase()==='a')
+        moveLeft = true;
+
+    if(e.key.toLowerCase()==='d')
+        moveRight = true;
+});
+
+window.addEventListener('keyup',(e)=>{
+
+    if(e.key.toLowerCase()==='a')
+        moveLeft = false;
+
+    if(e.key.toLowerCase()==='d')
+        moveRight = false;
+});
+update(0);
+
+const clock=new THREE.Clock();
+
+function animate(){
+
+    requestAnimationFrame(animate);
+
+    const t = clock.getElapsedTime();
+
+    // Timeline control via keyboard
+
+    if(moveLeft){
+
+        slider.value = Math.max(
+            0,
+            parseFloat(slider.value) - 0.02
+        );
+
+        update(
+            parseFloat(slider.value)
+        );
+    }
+
+    if(moveRight){
+
+        slider.value = Math.min(
+            7,
+            parseFloat(slider.value) + 0.02
+        );
+
+        update(
+            parseFloat(slider.value)
+        );
+    }
+
+    // Cinematic camera orbit
+
+    camera.position.x =
+        Math.sin(t * 0.08) * 850;
+
+    camera.position.z =
+        Math.cos(t * 0.08) * 850;
+
+    camera.position.y =
+        180 +
+        Math.sin(t * 0.05) * 80;
+
+    // Slight drift for documentary feel
+
+    camera.lookAt(
+        Math.sin(t * 0.03) * 40,
+        0,
+        0
+    );
+
+    // Rotate final remnant
+
+    remnant.rotation.y += 0.0005;
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+animate();
+</script>
+</body>
+</html>

@@ -1,0 +1,794 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌌 Galaxy Discovery Explorer</title>
+
+<style>
+
+body {
+    margin: 0;
+    overflow: hidden;
+    background: black;
+    font-family: Arial, sans-serif;
+}
+
+#info {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: white;
+    background: rgba(0,0,0,0.7);
+    padding: 12px 20px;
+    border-radius: 20px;
+    z-index: 10;
+}
+
+.control-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.7);
+    padding: 15px;
+    border-radius: 20px;
+    color: white;
+    z-index: 10;
+    width: 240px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 12px;
+    background: #1f2d3d;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #304860;
+}
+
+#planet-detail {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0,0,0,0.75);
+    color: white;
+    padding: 15px;
+    border-radius: 16px;
+    max-width: 340px;
+    z-index: 10;
+    line-height: 1.6;
+}
+
+.planet-name {
+    color: orange;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="info">
+    <h2>🌌 GALAXY DISCOVERY EXPLORER</h2>
+    <p>Procedural Solar Systems & Exoplanet Discovery</p>
+</div>
+
+<div class="control-panel">
+
+    <h3>🎮 Controls</h3>
+
+    <button id="discover-btn">
+        🌌 Discover New System
+    </button>
+
+    <button id="pause-btn">
+        ⏸ Pause / Resume
+    </button>
+
+</div>
+
+<div id="planet-detail">
+
+    <div class="planet-name">
+        ✨ Select a Planet
+    </div>
+
+    <div id="detail-content">
+        Click on any discovered world to inspect it.
+    </div>
+
+</div>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+    }
+}
+</script>
+
+<script type="module">
+
+import * as THREE from 'three';
+
+import { OrbitControls }
+from 'three/addons/controls/OrbitControls.js';
+
+import {
+    CSS2DRenderer,
+    CSS2DObject
+}
+from 'three/addons/renderers/CSS2DRenderer.js';
+
+
+// ======================================
+// SCENE
+// ======================================
+
+const scene = new THREE.Scene();
+
+scene.background =
+    new THREE.Color(0x000010);
+
+const camera =
+    new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        5000
+    );
+
+camera.position.set(0, 20, 40);
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias: true
+    });
+
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+);
+
+document.body.appendChild(
+    renderer.domElement
+);
+
+
+// ======================================
+// LABEL RENDERER
+// ======================================
+
+const labelRenderer =
+    new CSS2DRenderer();
+
+labelRenderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+);
+
+labelRenderer.domElement.style.position =
+    'absolute';
+
+labelRenderer.domElement.style.top =
+    '0px';
+
+labelRenderer.domElement.style.pointerEvents =
+    'none';
+
+document.body.appendChild(
+    labelRenderer.domElement
+);
+
+
+// ======================================
+// CONTROLS
+// ======================================
+
+const controls =
+    new OrbitControls(
+        camera,
+        renderer.domElement
+    );
+
+controls.enableDamping = true;
+
+
+// ======================================
+// LIGHTING
+// ======================================
+
+const ambientLight =
+    new THREE.AmbientLight(
+        0xffffff,
+        0.3
+    );
+
+scene.add(ambientLight);
+
+const sunLight =
+    new THREE.PointLight(
+        0xffaa55,
+        2,
+        1000
+    );
+
+scene.add(sunLight);
+
+
+// ======================================
+// STARFIELD
+// ======================================
+
+const starGeometry =
+    new THREE.BufferGeometry();
+
+const starVertices = [];
+
+for (let i = 0; i < 4000; i++) {
+
+    starVertices.push(
+        (Math.random() - 0.5) * 5000,
+        (Math.random() - 0.5) * 5000,
+        (Math.random() - 0.5) * 5000
+    );
+}
+
+starGeometry.setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute(
+        starVertices,
+        3
+    )
+);
+
+const starMaterial =
+    new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 1
+    });
+
+const stars =
+    new THREE.Points(
+        starGeometry,
+        starMaterial
+    );
+
+scene.add(stars);
+
+
+// ======================================
+// SUN
+// ======================================
+
+const sunGeometry =
+    new THREE.SphereGeometry(
+        3,
+        64,
+        64
+    );
+
+const sunMaterial =
+    new THREE.MeshStandardMaterial({
+
+        color: 0xffaa33,
+        emissive: 0xff5500,
+        emissiveIntensity: 1
+    });
+
+const sun =
+    new THREE.Mesh(
+        sunGeometry,
+        sunMaterial
+    );
+
+scene.add(sun);
+
+
+// ======================================
+// DATA
+// ======================================
+
+let planets = [];
+let orbitObjects = [];
+
+const planetNames = [
+    "Aether",
+    "Nova",
+    "Zenith",
+    "Cryon",
+    "Helios",
+    "Drakon",
+    "Orion",
+    "Titan",
+    "Xenon",
+    "Eclipse"
+];
+
+const planetTypes = [
+    "Rocky World",
+    "Gas Giant",
+    "Ocean Planet",
+    "Ice World",
+    "Volcanic Planet",
+    "Desert Planet",
+    "Frozen Exoplanet",
+    "Toxic Atmosphere World"
+];
+
+const lifeForms = [
+    "No detected life",
+    "Microbial organisms",
+    "Unknown biological signatures",
+    "Primitive alien vegetation",
+    "Ancient extinct civilization",
+    "Energy-based lifeforms detected"
+];
+
+const atmosphereTypes = [
+    "Nitrogen-Oxygen",
+    "Methane Rich",
+    "Hydrogen-Helium",
+    "Carbon Dioxide",
+    "Sulfuric Clouds",
+    "Ammonia Storms"
+];
+
+
+// ======================================
+// HELPERS
+// ======================================
+
+function randomColor() {
+
+    return new THREE.Color(
+        Math.random(),
+        Math.random(),
+        Math.random()
+    );
+}
+
+function createOrbit(radius, color) {
+
+    const points = [];
+
+    for (let i = 0; i <= 128; i++) {
+
+        const angle =
+            (i / 128) * Math.PI * 2;
+
+        points.push(
+            new THREE.Vector3(
+                Math.cos(angle) * radius,
+                0,
+                Math.sin(angle) * radius
+            )
+        );
+    }
+
+    const geometry =
+        new THREE.BufferGeometry()
+        .setFromPoints(points);
+
+    const material =
+        new THREE.LineBasicMaterial({
+            color: color
+        });
+
+    const orbit =
+        new THREE.LineLoop(
+            geometry,
+            material
+        );
+
+    scene.add(orbit);
+
+    return orbit;
+}
+
+
+// ======================================
+// CLEAR CURRENT SYSTEM
+// ======================================
+
+function clearCurrentSystem() {
+
+    planets.forEach(p => {
+
+        scene.remove(p.mesh);
+        scene.remove(p.label);
+    });
+
+    orbitObjects.forEach(o => {
+
+        scene.remove(o);
+    });
+
+    planets = [];
+    orbitObjects = [];
+}
+
+
+// ======================================
+// GENERATE SOLAR SYSTEM
+// ======================================
+
+function generateSolarSystem() {
+
+    clearCurrentSystem();
+
+    sunMaterial.color =
+        randomColor();
+
+    sunMaterial.emissive =
+        randomColor();
+
+    const planetCount =
+        Math.floor(Math.random() * 6) + 4;
+
+    for (let i = 0; i < planetCount; i++) {
+
+        const size =
+            Math.random() * 1.4 + 0.3;
+
+        const distance =
+            8 + i * 6;
+
+        const speed =
+            0.002 + Math.random() * 0.01;
+
+        const orbit =
+            createOrbit(
+                distance,
+                Math.random() * 0xffffff
+            );
+
+        orbitObjects.push(orbit);
+
+        const geometry =
+            new THREE.SphereGeometry(
+                size,
+                32,
+                32
+            );
+
+        const material =
+            new THREE.MeshStandardMaterial({
+
+                color: randomColor(),
+                roughness: 0.6,
+                metalness: 0.2
+            });
+
+        const planet =
+            new THREE.Mesh(
+                geometry,
+                material
+            );
+
+        const name =
+            planetNames[
+                Math.floor(
+                    Math.random()
+                    * planetNames.length
+                )
+            ]
+            + "-"
+            + Math.floor(Math.random() * 999);
+
+        planet.userData = {
+
+            name: name,
+
+            type:
+                planetTypes[
+                    Math.floor(
+                        Math.random()
+                        * planetTypes.length
+                    )
+                ],
+
+            atmosphere:
+                atmosphereTypes[
+                    Math.floor(
+                        Math.random()
+                        * atmosphereTypes.length
+                    )
+                ],
+
+            life:
+                lifeForms[
+                    Math.floor(
+                        Math.random()
+                        * lifeForms.length
+                    )
+                ],
+
+            detail:
+                "Procedurally discovered celestial body located deep within unexplored galactic space.",
+
+            mass:
+                (Math.random() * 100)
+                .toFixed(2)
+                + " ×10²⁴ kg",
+
+            radius:
+                Math.floor(
+                    Math.random() * 70000
+                )
+                + " km",
+
+            temp:
+                Math.floor(
+                    Math.random() * 500 - 200
+                )
+                + "°C",
+
+            gravity:
+                (Math.random() * 30)
+                .toFixed(1)
+                + " m/s²",
+
+            moons:
+                Math.floor(
+                    Math.random() * 12
+                ),
+
+            orbitDays:
+                Math.floor(
+                    Math.random() * 5000
+                )
+                + " days"
+        };
+
+        scene.add(planet);
+
+        // LABEL
+
+        const div =
+            document.createElement('div');
+
+        div.textContent = name;
+
+        div.style.color = 'white';
+        div.style.background =
+            'rgba(0,0,0,0.7)';
+
+        div.style.padding =
+            '4px 8px';
+
+        div.style.borderRadius =
+            '12px';
+
+        div.style.fontSize =
+            '12px';
+
+        const label =
+            new CSS2DObject(div);
+
+        scene.add(label);
+
+        planets.push({
+
+            mesh: planet,
+            label: label,
+            distance: distance,
+            speed: speed,
+            angle:
+                Math.random()
+                * Math.PI * 2
+        });
+    }
+
+    console.log(
+        "🌌 New Solar System Generated"
+    );
+}
+
+
+// ======================================
+// PLANET CLICK DETECTION
+// ======================================
+
+const raycaster =
+    new THREE.Raycaster();
+
+const mouse =
+    new THREE.Vector2();
+
+window.addEventListener(
+    'click',
+    (event) => {
+
+        mouse.x =
+            (event.clientX
+            / window.innerWidth)
+            * 2 - 1;
+
+        mouse.y =
+            -(event.clientY
+            / window.innerHeight)
+            * 2 + 1;
+
+        raycaster.setFromCamera(
+            mouse,
+            camera
+        );
+
+        const intersects =
+            raycaster.intersectObjects(
+                planets.map(p => p.mesh)
+            );
+
+        if (intersects.length > 0) {
+
+            const data =
+                intersects[0]
+                .object
+                .userData;
+
+            document.querySelector(
+                '.planet-name'
+            ).innerHTML =
+                "🪐 " + data.name;
+
+            document.getElementById(
+                'detail-content'
+            ).innerHTML =
+
+            `
+            🌎 Type: ${data.type}<br>
+            🌍 Mass: ${data.mass}<br>
+            📏 Radius: ${data.radius}<br>
+            🌡 Temperature: ${data.temp}<br>
+            🌪 Atmosphere: ${data.atmosphere}<br>
+            🌕 Moons: ${data.moons}<br>
+            🛰 Orbit: ${data.orbitDays}<br>
+            🧲 Gravity: ${data.gravity}<br>
+            👽 Life Scan: ${data.life}<br><br>
+
+            ✨ ${data.detail}
+            `;
+        }
+    }
+);
+
+
+// ======================================
+// BUTTONS
+// ======================================
+
+document
+.getElementById('discover-btn')
+.addEventListener('click', () => {
+
+    generateSolarSystem();
+
+    document.querySelector(
+        '.planet-name'
+    ).innerHTML =
+        "🌌 New System";
+
+    document.getElementById(
+        'detail-content'
+    ).innerHTML =
+        "A newly discovered solar system has been generated.";
+});
+
+let paused = false;
+
+document
+.getElementById('pause-btn')
+.addEventListener('click', () => {
+
+    paused = !paused;
+});
+
+
+// ======================================
+// INITIAL GENERATION
+// ======================================
+
+generateSolarSystem();
+
+
+// ======================================
+// ANIMATION LOOP
+// ======================================
+
+function animate() {
+
+    requestAnimationFrame(
+        animate
+    );
+
+    if (!paused) {
+
+        planets.forEach(p => {
+
+            p.angle += p.speed;
+
+            const x =
+                Math.cos(p.angle)
+                * p.distance;
+
+            const z =
+                Math.sin(p.angle)
+                * p.distance;
+
+            p.mesh.position.set(
+                x,
+                0,
+                z
+            );
+
+            p.label.position.set(
+                x,
+                2,
+                z
+            );
+        });
+
+        stars.rotation.y += 0.0002;
+    }
+
+    controls.update();
+
+    renderer.render(
+        scene,
+        camera
+    );
+
+    labelRenderer.render(
+        scene,
+        camera
+    );
+}
+
+animate();
+
+
+// ======================================
+// RESIZE
+// ======================================
+
+window.addEventListener(
+    'resize',
+    () => {
+
+        camera.aspect =
+            window.innerWidth
+            / window.innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+
+        labelRenderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+    }
+);
+
+</script>
+
+</body>
+</html>
+ 
