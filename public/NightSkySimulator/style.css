@@ -1,0 +1,257 @@
+:root {
+  --bg: #070a12;
+  --panel: rgba(10, 16, 28, 0.92);
+  --text: #e8f1ff;
+  --muted: #b2c2de;
+  --accent: #ffcc70;
+  --blue: #7ec3ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+#app {
+  display: grid;
+  grid-template-columns: 80% 20%;
+  width: 100vw;
+  height: 100vh;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+/* Container Panels */
+#left,
+#right {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fixes the black/blank spaces on window scaling and zooming */
+#mainCanvas,
+#skyCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  flex-grow: 1;
+  object-fit: cover; /* Forces the canvas area to fill its box boundaries */
+}
+
+#right {
+  background: radial-gradient(circle at top, #121b2c, #070a12 70%);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ======================================
+    SKY VIEW PANEL (RIGHT SIDE)
+====================================== */
+
+.panel-title {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Relocated target box to bottom right */
+.panel-info {
+  position: absolute;
+  bottom: 55px;
+  right: 20px;
+  left: auto;
+  font-size: 28px;
+  font-weight: 700;
+  text-align: right;
+  color: var(--blue);
+  line-height: 1.3;
+  text-shadow: 0 0 10px rgba(126, 195, 255, 0.85);
+}
+
+.panel-footer {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  right: 18px;
+  font-size: 14px;
+  color: var(--muted);
+  text-align: right; /* Aligned right to balance the new target info position */
+}
+
+/* ======================================
+    KOLKATA SKY POINTER PANEL
+====================================== */
+
+/* ======================================
+    KOLKATA SKY POINTER PANEL (TOP LEFT -> BOTTOM RIGHT)
+====================================== */
+
+/* ======================================
+    KOLKATA SKY POINTER PANEL (SIDE-BY-SIDE)
+====================================== */
+
+.overlay {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  top: auto;
+  left: auto;
+
+  /* Widened to fit both sections horizontally */
+  width: 460px; 
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+  
+  /* Creates a 2-column layout dividing data and observer details */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  z-index: 100;
+}
+
+.readouts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 19px;
+  font-family: Consolas, "Courier New", monospace;
+  color: white;
+
+}
+
+.help {
+  /* Removed border-top since it sits on the side now */
+  border-top: none; 
+  /* Added a subtle vertical line between the two columns */
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  padding-left: 20px;
+  padding-top: 0;
+  
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 19px;
+  color: #c8d7ef;
+}
+
+.title, .help-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+#nearest {
+  color: #ffd978;
+  font-weight: 700;
+}
+/* ======================================
+    SLIDER CONTROL DOCK
+====================================== */
+
+.controlDock {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  
+  /* Container ends exactly where the sliders end */
+  width: max-content; 
+  min-width: 450px; 
+
+  background: rgba(10, 16, 28, 0.96);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+}
+
+.dockTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.sliderBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+}
+
+/* ======================================
+    SLIDERS
+====================================== */
+
+.controlDock input[type="range"] {
+  width: 100%; 
+  height: 18px;
+  appearance: none;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #3d6eff, #7ec3ff);
+  outline: none;
+  cursor: pointer;
+}
+
+.controlDock input[type="range"]:hover {
+  filter: brightness(1.15);
+}
+
+.controlDock input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: white;
+  border: 4px solid #7ec3ff;
+  box-shadow: 0 0 15px rgba(126, 195, 255, 0.9);
+  cursor: pointer;
+}
+
+.controlDock input[type="range"]::-moz-range-thumb {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: white;
+  border: 4px solid #7ec3ff;
+  cursor: pointer;
+}

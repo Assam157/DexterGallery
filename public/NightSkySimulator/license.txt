@@ -1,0 +1,11 @@
+Model Information:
+* title:	ESA Optical Ground Station
+* source:	https://sketchfab.com/3d-models/esa-optical-ground-station-73f9ddfa1e96447093718cb3a6bc11fd
+* author:	Fig Fogg (https://sketchfab.com/figfogg)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "ESA Optical Ground Station" (https://sketchfab.com/3d-models/esa-optical-ground-station-73f9ddfa1e96447093718cb3a6bc11fd) by Fig Fogg (https://sketchfab.com/figfogg) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

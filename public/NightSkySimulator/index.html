@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Night Sky Pointer</title>
+</head>
+<body>
+  <div id="app">
+    <div id="left">
+
+
+      
+      <canvas id="mainCanvas"></canvas>
+
+      <div class="overlay">
+        <div class="readouts">
+          <div>Azimuth: <span id="az">180</span>°</div>
+          <div>Altitude: <span id="alt">45</span>°</div>
+          <div>Local Time: <span id="localTime">--:--</span></div>
+          <div>Nearest Star: <span id="nearest">--</span></div>
+        </div>
+
+        <div class="help">
+          <div class="help-title">Observer</div>
+          <div>Latitude:22.57°N</div>
+          <div>Longitude:88.36°E</div>
+          <div>Viewing Window:</div>
+          <div>19:00 → 06:00 IST</div>
+        </div>
+      </div>
+
+      <div class="controlDock">
+        <div class="sliderBlock">
+          <div class="sliderHeader">
+            <span>Azimuth</span>
+            <span id="azSliderValue">180°</span>
+          </div>
+          <input
+            type="range"
+            id="azSlider"
+            min="0"
+            max="360"
+            value="180"
+            step="0.5"
+          />
+        </div>
+
+        <div class="sliderBlock">
+          <div class="sliderHeader">
+            <span>Altitude</span>
+            <span id="altSliderValue">45°</span>
+          </div>
+          <input
+            type="range"
+            id="altSlider"
+            min="0"
+            max="90"
+            value="45"
+            step="0.1"
+          />
+        </div>
+
+        <div class="sliderBlock">
+          <div class="sliderHeader">
+            <span>Time of Night</span>
+            <span id="timeSliderValue">21:00</span>
+          </div>
+          <input
+            type="range"
+            id="timeSlider"
+            min="1140"
+            max="1800"
+            value="1260"
+            step="1"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div id="right">
+      <div class="panel-title">Sky View</div>
+      <canvas id="skyCanvas"></canvas>
+      <div id="skyInfo" class="panel-info">Target: --</div>
+      <div class="panel-footer">
+        <span>Finder scope view centered on laser hit point</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

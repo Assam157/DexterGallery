@@ -1,0 +1,22 @@
+# Blender 4.4.3 MTL File: 'NightObservatory.blend'
+# www.blender.org
+
+newmtl Mat_0
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/Hp/Downloads/esa-optical-ground-station/source/ESA Optical Ground Station/texture_0_6195987693227547908.png
+
+newmtl Mat_1
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/Hp/Downloads/esa-optical-ground-station/source/ESA Optical Ground Station/texture_4_11563080508590297124.png
