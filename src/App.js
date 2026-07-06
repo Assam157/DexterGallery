@@ -1,4 +1,4 @@
- import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 
 import RadiationPhysicsLab from "./components/RaadiationPhysicsLab";
+import DiscoveryHub from "./components/DiscoveryHub";
 import OpticalDexterLab from "./components/OpticalLab";
 import AstronomyLab from "./components/AStronomyLab";
 import SemiconductorDexterLab from "./components/SemiconducterLab";
@@ -23,7 +24,7 @@ import DiodeBiasLab from "./components/PN-JunctionDiodeShwoing";
 import PNJunctionDiffusion from "./components/PNJunctionDIode"; 
 import CSLab from "./components/CSLab";
 import RoboticsLab from "./components/RoboticsAutomationLab"; // Add Robotics Lab
-import DiscoveryHub from "./components/DiscoveryHub";
+
 /* ==============================
    MAIN MENU
 ================================ */
@@ -31,29 +32,23 @@ function DexterHome() {
   const navigate = useNavigate();
   const installEventRef = useRef(null);
   const [isInstalled, setIsInstalled] = React.useState(false);
-  
+
   /* ==============================
      INSTALL STATE DETECTION
   ============================== */
   useEffect(() => {
-    // Check if app is already installed
     const checkInstalled = () => {
       const isStandalone =
         window.matchMedia("(display-mode: standalone)").matches ||
         window.navigator.standalone === true;
-
       if (isStandalone) setIsInstalled(true);
     };
-
     checkInstalled();
 
-    // Capture install prompt
     const handleBeforeInstall = (e) => {
       e.preventDefault();
       installEventRef.current = e;
     };
-
-    // Fired when installation is completed
     const handleInstalled = () => {
       setIsInstalled(true);
       installEventRef.current = null;
@@ -61,63 +56,35 @@ function DexterHome() {
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstall);
     window.addEventListener("appinstalled", handleInstalled);
-
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
       window.removeEventListener("appinstalled", handleInstalled);
     };
   }, []);
-  
+
+  /* ==============================
+     KEYBOARD NAVIGATION
+  ============================== */
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // ignore typing inside inputs
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
-
       switch (e.key) {
-        case "1":
-          navigate("/radiation");
-          break;
-        case "2":
-          navigate("/optical");
-          break;
-        case "3":
-          navigate("/semiconductor");
-          break;
-        case "4":
-          navigate("/em");
-          break;
-        case "5":
-          navigate("/sid");
-          break;
-        case "6":
-          navigate("/digital");
-          break;
-        case "7":
-          navigate("/quantum");
-          break;
-        case "8":
-          navigate("/astronomy");
-          break;
-        case "9":
-          navigate("/chemistry");
-          break;
-        case "0":
-          navigate("/mathemetics");
-          break;
-        case "-":
-          navigate("/cs");
-          break;
-        case "=":  // Use = key for Robotics Lab
-          navigate("/robotics");
-          break;
-        case "]":
-          navigate("/discover");
-          break;
-        default:
-          break;
+        case "1": navigate("/radiation"); break;
+        case "]": navigate("/discover"); break;
+        case "2": navigate("/optical"); break;
+        case "3": navigate("/semiconductor"); break;
+        case "4": navigate("/em"); break;
+        case "5": navigate("/sid"); break;
+        case "6": navigate("/digital"); break;
+        case "7": navigate("/quantum"); break;
+        case "8": navigate("/astronomy"); break;
+        case "9": navigate("/chemistry"); break;
+        case "0": navigate("/mathemetics"); break;
+        case "-": navigate("/cs"); break;
+        case "=": navigate("/robotics"); break;
+        default: break;
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [navigate]);
@@ -137,103 +104,41 @@ function DexterHome() {
       );
       return;
     }
-
     installEventRef.current.prompt();
     await installEventRef.current.userChoice;
     installEventRef.current = null;
   };
 
-  /* ==============================
-     UI - ORIGINAL VERTICAL LAYOUT
-  ============================== */
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "radial-gradient(#050505, #000)",
-        color: "#0f0",
-        fontFamily: "monospace",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 20
-      }}
-    >
-      <h1>PARTICLE PHYSICS LAB CONSOLE</h1>
+    <div className="console-bg">
+      <div className="console-panel">
+        <h1 className="console-title">⚛️ PARTICLE PHYSICS LAB CONSOLE</h1>
 
-      {/* 🔥 INSTALL BUTTON — ONLY IF NOT INSTALLED */}
-      {!isInstalled && (
-        <button
-          className="lab-btn"
-          style={{
-            border: "2px solid #0f0",
-            boxShadow: "0 0 20px #0f0"
-          }}
-          onClick={triggerInstall}
-        >
-          ⬇ INSTALL DEXTERS LAB
-        </button>
-      )}
-      
+        {!isInstalled && (
+          <button className="install-btn" onClick={triggerInstall}>
+            ⬇ INSTALL DEXTERS LAB
+          </button>
+        )}
 
-      <button className="lab-btn" onClick={() => navigate("/radiation")}>
-        ☢ Radiation Physics Lab
-      </button>
-      
-      <button className="lab-btn" onClick={() => navigate("/chemistry")}>
-        🧪 Chemistry Lab
-      </button>
-
-      <button className="lab-btn" onClick={() => navigate("/optical")}>
-        🔍 Optical Deflection Lab
-      </button>
-
-      <button className="lab-btn" onClick={() => navigate("/semiconductor")}>
-        🔌 Semiconductor Lab
-      </button>
-      
-      <button className="lab-btn" onClick={() => navigate("/astronomy")}>
-        🚀 Astronomy Lab
-      </button>
-      
-      <button className="lab-btn" onClick={() => navigate("/em")}>
-        🧲 Electromagnetism Lab
-      </button>
-
-      <button className="lab-btn" onClick={() => navigate("/sid")}>
-        🚀 SID Physics Lab (Kinematics)
-      </button>
-
-      <button className="lab-btn" onClick={() => navigate("/digital")}>
-        🧩 Digital Lab
-      </button>
-      
-      <button className="lab-btn" onClick={() => navigate("/quantum")}>
-        ⚛️ Quantum Lab
-      </button>
-      
-      <button className="lab-btn" onClick={() => navigate("/mathemetics")}>
-        🧮 Mathematics Lab
-      </button>
-
-      <button className="lab-btn" onClick={() => navigate("/cs")}>
-        💻 Computer Science Lab
-      </button>
-
-      <button className="lab-btn" onClick={() => navigate("/robotics")}>
-        🤖 Robotics & Automation Lab
-      </button>
-      <button
-className="lab-btn"
-onClick={()=>navigate("/discover")}
->
-🌌 Discovery Hub
-</button>
+        <div className="lab-grid">
+          <button className="lab-button" onClick={() => navigate("/discover")}>🌌 Discovery Hub</button>
+          <button className="lab-button" onClick={() => navigate("/radiation")}>☢ Radiation Physics Lab</button>
+          <button className="lab-button" onClick={() => navigate("/chemistry")}>🧪 Chemistry Lab</button>
+          <button className="lab-button" onClick={() => navigate("/optical")}>🔍 Optical Deflection Lab</button>
+          <button className="lab-button" onClick={() => navigate("/semiconductor")}>🔌 Semiconductor Lab</button>
+          <button className="lab-button" onClick={() => navigate("/astronomy")}>🚀 Astronomy Lab</button>
+          <button className="lab-button" onClick={() => navigate("/em")}>🧲 Electromagnetism Lab</button>
+          <button className="lab-button" onClick={() => navigate("/sid")}>🚀 SID Physics Lab (Kinematics)</button>
+          <button className="lab-button" onClick={() => navigate("/digital")}>🧩 Digital Lab</button>
+          <button className="lab-button" onClick={() => navigate("/quantum")}>⚛️ Quantum Lab</button>
+          <button className="lab-button" onClick={() => navigate("/mathemetics")}>🧮 Mathematics Lab</button>
+          <button className="lab-button" onClick={() => navigate("/cs")}>💻 Computer Science Lab</button>
+          <button className="lab-button" onClick={() => navigate("/robotics")}>🤖 Robotics & Automation Lab</button>
+        </div>
+      </div>
     </div>
   );
 }
-
 
 /* ==============================
    APP ROOT
@@ -243,7 +148,7 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<DexterHome />} />
-        <Route path="/discover" element={<DiscoveryHub/>}/>
+        <Route path="/discover" element={<DiscoveryHub />} />
         <Route path="/radiation" element={<RadiationPhysicsLab />} />
         <Route path="/optical" element={<OpticalDexterLab />} />
         <Route path="/semiconductor" element={<SemiconductorDexterLab />} />
