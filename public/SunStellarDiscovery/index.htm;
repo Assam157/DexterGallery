@@ -1,0 +1,863 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NASA Stellar Spectroscopy Laboratory</title>
+
+<style>
+
+body{
+    margin:0;
+    overflow:hidden;
+    background:#02040a;
+    font-family:Arial,sans-serif;
+    color:white;
+}
+
+#main-container{
+    display:flex;
+    width:100vw;
+    height:100vh;
+}
+
+/* ================================= */
+/* LEFT PANEL */
+/* ================================= */
+
+#visual-panel{
+
+    width:55%;
+    height:100%;
+    position:relative;
+    background:#000814;
+    border-right:2px solid #1b263b;
+}
+
+#render-container{
+    width:100%;
+    height:100%;
+}
+
+#visual-header{
+
+    position:absolute;
+    top:20px;
+    left:20px;
+
+    z-index:10;
+
+    font-size:28px;
+
+    color:#ffaa33;
+
+    background:rgba(0,0,0,0.75);
+
+    padding:16px 24px;
+
+    border-radius:14px;
+}
+
+#star-basic-info{
+
+    position:absolute;
+
+    bottom:30px;
+
+    left:30px;
+
+    z-index:10;
+
+    background:rgba(0,0,0,0.75);
+
+    padding:22px;
+
+    border-radius:16px;
+
+    width:380px;
+}
+
+#star-name{
+
+    font-size:38px;
+
+    color:#ffaa33;
+
+    margin-bottom:10px;
+}
+
+#star-short-data{
+
+    font-size:18px;
+
+    color:#cccccc;
+
+    line-height:1.7;
+}
+
+/* ================================= */
+/* RIGHT PANEL */
+/* ================================= */
+
+#analysis-panel{
+
+    width:45%;
+    height:100%;
+
+    background:#0d1b2a;
+
+    overflow-y:auto;
+
+    padding:30px;
+
+    box-sizing:border-box;
+}
+
+#analysis-header{
+
+    font-size:30px;
+
+    color:#4cc9f0;
+
+    margin-bottom:24px;
+}
+
+#next-star-btn{
+
+    width:100%;
+
+    padding:14px;
+
+    background:#1d3557;
+
+    border:none;
+
+    border-radius:12px;
+
+    color:white;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+    margin-bottom:26px;
+
+    transition:0.2s;
+}
+
+#next-star-btn:hover{
+
+    background:#274c77;
+}
+
+#spectrumCanvas{
+
+    width:100%;
+
+    height:220px;
+
+    background:black;
+
+    border:2px solid #333;
+
+    border-radius:12px;
+}
+
+#analysis-data{
+
+    margin-top:26px;
+
+    line-height:1.9;
+
+    font-size:16px;
+
+    white-space:pre-line;
+}
+
+/* ================================= */
+/* SCROLLBAR */
+/* ================================= */
+
+::-webkit-scrollbar{
+    width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#35506d;
+    border-radius:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="main-container">
+
+    <!-- ================================= -->
+    <!-- LEFT PANEL -->
+    <!-- ================================= -->
+
+    <div id="visual-panel">
+
+        <div id="visual-header">
+
+            ☀ STELLAR OBSERVATION CHAMBER
+
+        </div>
+
+        <div id="render-container"></div>
+
+        <div id="star-basic-info">
+
+            <div id="star-name">
+
+                Betelgeuse
+
+            </div>
+
+            <div id="star-short-data">
+
+                Red Supergiant · M1–M2 Ia-Iab
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- RIGHT PANEL -->
+    <!-- ================================= -->
+
+    <div id="analysis-panel">
+
+        <div id="analysis-header">
+
+            🌈 NASA STELLAR SPECTROSCOPY LAB
+
+        </div>
+
+        <button id="next-star-btn">
+
+            Analyze Next Star
+
+        </button>
+
+        <canvas
+            id="spectrumCanvas"
+            width="720"
+            height="220">
+        </canvas>
+
+        <div id="analysis-data">
+
+            Awaiting spectroscopic analysis...
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================================= -->
+<!-- THREE.JS IMPORT -->
+<!-- ================================= -->
+
+<script type="importmap">
+{
+    "imports": {
+        "three":
+        "https://unpkg.com/three@0.128.0/build/three.module.js",
+
+        "three/addons/":
+        "https://unpkg.com/three@0.128.0/examples/jsm/"
+    }
+}
+</script>
+
+<script type="module">
+
+import * as THREE from 'three';
+
+import {
+    OrbitControls
+}
+from 'three/addons/controls/OrbitControls.js';
+
+
+// =====================================
+// THREE SCENE
+// =====================================
+
+const container =
+    document.getElementById(
+        'render-container'
+    );
+
+const scene =
+    new THREE.Scene();
+
+scene.background =
+    new THREE.Color(0x000814);
+
+const camera =
+    new THREE.PerspectiveCamera(
+        60,
+        container.clientWidth /
+        container.clientHeight,
+        0.1,
+        5000
+    );
+
+camera.position.set(0,0,10);
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias:true
+    });
+
+renderer.setSize(
+    container.clientWidth,
+    container.clientHeight
+);
+
+container.appendChild(
+    renderer.domElement
+);
+
+
+// =====================================
+// CONTROLS
+// =====================================
+
+const controls =
+    new OrbitControls(
+        camera,
+        renderer.domElement
+    );
+
+controls.enablePan = false;
+controls.enableDamping = true;
+
+controls.minDistance = 5;
+controls.maxDistance = 25;
+
+
+// =====================================
+// LIGHTING
+// =====================================
+
+const ambient =
+    new THREE.AmbientLight(
+        0xffffff,
+        0.2
+    );
+
+scene.add(ambient);
+
+const starLight =
+    new THREE.PointLight(
+        0xffffff,
+        4,
+        200
+    );
+
+scene.add(starLight);
+
+
+// =====================================
+// STARFIELD
+// =====================================
+
+const starfieldGeo =
+    new THREE.BufferGeometry();
+
+const verts = [];
+
+for(let i=0;i<5000;i++){
+
+    verts.push(
+        (Math.random()-0.5)*4000,
+        (Math.random()-0.5)*4000,
+        (Math.random()-0.5)*4000
+    );
+}
+
+starfieldGeo.setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute(
+        verts,
+        3
+    )
+);
+
+const starfieldMat =
+    new THREE.PointsMaterial({
+        color:0xffffff,
+        size:1
+    });
+
+const starfield =
+    new THREE.Points(
+        starfieldGeo,
+        starfieldMat
+    );
+
+scene.add(starfield);
+
+
+// =====================================
+// STAR OBJECT
+// =====================================
+
+const starGeometry =
+    new THREE.SphereGeometry(
+        2.8,
+        128,
+        128
+    );
+
+const starMaterial =
+    new THREE.MeshStandardMaterial({
+
+        color:0xffffff,
+
+        emissive:0xffffff,
+
+        emissiveIntensity:1.4
+    });
+
+const star =
+    new THREE.Mesh(
+        starGeometry,
+        starMaterial
+    );
+
+scene.add(star);
+
+
+// =====================================
+// NASA STYLE STAR DATABASE
+// =====================================
+
+const stars = [
+
+{
+    name:"Sun",
+    spectral:"G2V",
+    type:"Yellow Dwarf",
+    temp:"5778 K",
+    radius:"695,700 km",
+    luminosity:"1 L☉",
+    distance:"0 AU",
+    composition:"Hydrogen, Helium",
+    nasa:"NASA Solar Physics",
+    color:0xfff4ea,
+
+    absorption:[
+        393,
+        434,
+        486,
+        517,
+        589,
+        656
+    ]
+},
+
+{
+    name:"Sirius A",
+    spectral:"A1V",
+    type:"Main Sequence",
+    temp:"9940 K",
+    radius:"1.71 R☉",
+    luminosity:"25.4 L☉",
+    distance:"8.6 ly",
+    composition:"Hydrogen Balmer Lines",
+    nasa:"Hubble Stellar Database",
+    color:0xcad7ff,
+
+    absorption:[
+        410,
+        434,
+        486,
+        656
+    ]
+},
+
+{
+    name:"Betelgeuse",
+    spectral:"M1-M2 Ia-Iab",
+    type:"Red Supergiant",
+    temp:"3500 K",
+    radius:"764 R☉",
+    luminosity:"126000 L☉",
+    distance:"548 ly",
+    composition:"Titanium Oxide",
+    nasa:"ESO + NASA Spectral Archive",
+    color:0xff8844,
+
+    absorption:[
+        516,
+        589,
+        615,
+        656
+    ]
+},
+
+{
+    name:"Rigel",
+    spectral:"B8 Ia",
+    type:"Blue Supergiant",
+    temp:"12100 K",
+    radius:"78.9 R☉",
+    luminosity:"120000 L☉",
+    distance:"860 ly",
+    composition:"Helium, Hydrogen",
+    nasa:"Hubble Spectroscopy Survey",
+    color:0x9bb0ff,
+
+    absorption:[
+        410,
+        434,
+        486,
+        656
+    ]
+},
+
+{
+    name:"Proxima Centauri",
+    spectral:"M5.5Ve",
+    type:"Red Dwarf",
+    temp:"3042 K",
+    radius:"0.1542 R☉",
+    luminosity:"0.0017 L☉",
+    distance:"4.24 ly",
+    composition:"Molecular Titanium Oxide",
+    nasa:"ESO Red Dwarf Survey",
+    color:0xff5533,
+
+    absorption:[
+        516,
+        589,
+        620,
+        656
+    ]
+},
+
+{
+    name:"Vega",
+    spectral:"A0V",
+    type:"White Main Sequence",
+    temp:"9602 K",
+    radius:"2.36 R☉",
+    luminosity:"40.12 L☉",
+    distance:"25 ly",
+    composition:"Strong Hydrogen Lines",
+    nasa:"NASA Calibration Standard",
+    color:0xdfe9ff,
+
+    absorption:[
+        410,
+        434,
+        486,
+        656
+    ]
+}
+
+];
+
+ 
+// =====================================
+// CURRENT STAR
+// =====================================
+
+let currentIndex = 0;
+
+
+// =====================================
+// UPDATE STAR
+// =====================================
+
+function updateStar(){
+
+    const s = stars[currentIndex];
+
+    starMaterial.color.setHex(
+        s.color
+    );
+
+    starMaterial.emissive.setHex(
+        s.color
+    );
+
+    starLight.color.setHex(
+        s.color
+    );
+
+    document.getElementById(
+        'star-name'
+    ).innerHTML =
+        s.name;
+
+    document.getElementById(
+        'star-short-data'
+    ).innerHTML =
+
+    `
+    ${s.type}<br>
+    Spectral Type: ${s.spectral}
+    `;
+
+    drawSpectrum(s);
+
+    updateAnalysis(s);
+}
+
+
+// =====================================
+// DRAW SPECTRUM
+// =====================================
+
+function drawSpectrum(starData){
+
+    const canvas =
+        document.getElementById(
+            'spectrumCanvas'
+        );
+
+    const ctx =
+        canvas.getContext('2d');
+
+    const width =
+        canvas.width;
+
+    const height =
+        canvas.height;
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    // visible spectrum
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            width,
+            0
+        );
+
+    gradient.addColorStop(0,"#ff0000");
+    gradient.addColorStop(0.15,"#ff8800");
+    gradient.addColorStop(0.3,"#ffff00");
+    gradient.addColorStop(0.45,"#00ff00");
+    gradient.addColorStop(0.6,"#00ffff");
+    gradient.addColorStop(0.75,"#0000ff");
+    gradient.addColorStop(1,"#8b00ff");
+
+    ctx.fillStyle = gradient;
+
+    ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    // absorption lines
+
+    ctx.fillStyle = "black";
+
+    starData.absorption.forEach(
+        wavelength=>{
+
+        const x =
+            ((700 - wavelength)
+            / 320)
+            * width;
+
+        ctx.fillRect(
+            x,
+            0,
+            5,
+            height
+        );
+    });
+
+    // labels
+
+    ctx.fillStyle = "white";
+
+    ctx.font = "16px Arial";
+
+    ctx.fillText(
+        "700nm",
+        10,
+        205
+    );
+
+    ctx.fillText(
+        "400nm",
+        640,
+        205
+    );
+}
+
+
+// =====================================
+// UPDATE ANALYSIS
+// =====================================
+
+function updateAnalysis(s){
+
+    document.getElementById(
+        'analysis-data'
+    ).innerHTML =
+
+`
+🔬 STELLAR SPECTROSCOPIC ANALYSIS
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⭐ Object:
+${s.name}
+
+📚 Spectral Classification:
+${s.spectral}
+
+☀ Stellar Category:
+${s.type}
+
+🌡 Effective Temperature:
+${s.temp}
+
+📏 Stellar Radius:
+${s.radius}
+
+💡 Luminosity:
+${s.luminosity}
+
+📍 Distance From Earth:
+${s.distance}
+
+🧪 Dominant Spectral Features:
+${s.composition}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HYDROGEN BALMER SERIES DETECTED
+
+• H-alpha → 656.3 nm
+• H-beta → 486.1 nm
+• H-gamma → 434.0 nm
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ADDITIONAL ABSORPTION FEATURES
+
+• Sodium D → 589.0 nm
+• Calcium K → 393.4 nm
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📡 Spectroscopic Source:
+${s.nasa}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STATUS:
+Spectrum resolved successfully.
+`;
+}
+
+
+// =====================================
+// BUTTON
+// =====================================
+
+document
+.getElementById(
+    'next-star-btn'
+)
+.addEventListener(
+    'click',
+    ()=>{
+
+        currentIndex++;
+
+        if(currentIndex >= stars.length){
+
+            currentIndex = 0;
+        }
+
+        updateStar();
+    }
+);
+
+
+// =====================================
+// INITIALIZE
+// =====================================
+
+updateStar();
+
+
+// =====================================
+// ANIMATION
+// =====================================
+
+function animate(){
+
+    requestAnimationFrame(
+        animate
+    );
+
+    star.rotation.y += 0.0018;
+
+    starfield.rotation.y += 0.0001;
+
+    controls.update();
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+animate();
+
+
+// =====================================
+// RESIZE
+// =====================================
+
+window.addEventListener(
+    'resize',
+    ()=>{
+
+        camera.aspect =
+            container.clientWidth /
+            container.clientHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            container.clientWidth,
+            container.clientHeight
+        );
+    }
+);
+
+</script>
+
+</body>
+</html>
+ 
