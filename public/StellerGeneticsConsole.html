@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>🧪 Dexter's Lab: Stellar Genetics Console | H-R Diagram Simulator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none; /* Prevent accidental text selection while using keys */
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 30%, #0f172a, #020617);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', 'Courier New', monospace;
+      padding: 24px;
+    }
+
+    /* Main Lab Console */
+    .dexter-lab {
+      max-width: 1300px;
+      width: 100%;
+      background: rgba(10, 20, 28, 0.75);
+      backdrop-filter: blur(12px);
+      border-radius: 3rem;
+      border: 2px solid #2dd4bf;
+      box-shadow: 0 25px 40px -12px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+      padding: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    /* Header Area */
+    .lab-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      gap: 12px;
+      border-bottom: 2px dashed #2dd4bf80;
+      padding-bottom: 0.75rem;
+    }
+    .title h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #a5f3fc, #2dd4bf);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+    .title p {
+      font-size: 0.7rem;
+      color: #5eead4;
+      margin: 0;
+      font-family: monospace;
+    }
+    .badge {
+      background: #0f2c2a;
+      padding: 6px 12px;
+      border-radius: 60px;
+      border: 1px solid #2dd4bf;
+      font-size: 0.7rem;
+      color: #99f6e4;
+    }
+
+    /* GRID: diagram + controls */
+    .hr-dashboard {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    /* H-R Diagram canvas */
+    .diagram-area {
+      flex: 2;
+      min-width: 580px;
+      background: #030712;
+      border-radius: 2rem;
+      padding: 12px;
+      border: 1px solid #2dd4bf40;
+      box-shadow: 0 0 0 1px #00000030, inset 0 0 0 2px #0f2622;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #01050f;
+      border-radius: 1rem;
+      margin: 0 auto;
+      cursor: crosshair;
+    }
+    .diagram-caption {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 0.7rem;
+      color: #b4f5e6;
+      font-family: monospace;
+    }
+
+    /* Control Panel (Dexter's injection panel) */
+    .control-panel {
+      flex: 1;
+      background: #07161fcc;
+      backdrop-filter: blur(4px);
+      border-radius: 2rem;
+      border: 1px solid #2dd4bf;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* Active slider styling */
+    .param-card {
+      background: #0a1a1f;
+      border-radius: 1.5rem;
+      padding: 1rem;
+      border: 2px solid #2c5e56;
+      transition: all 0.1s ease;
+    }
+    .param-card.active {
+      border-color: #facc15;
+      box-shadow: 0 0 0 3px #facc1540, 0 0 18px #facc1590;
+      background: #0d282b;
+    }
+    .param-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .param-icon {
+      font-size: 1.4rem;
+      background: #0f2c28;
+      width: 40px;
+      height: 40px;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #2dd4bf;
+    }
+    .param-label {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #cffafe;
+      letter-spacing: 1px;
+    }
+    .param-value {
+      font-size: 1.8rem;
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      color: #fde047;
+      text-shadow: 0 0 6px #fde04780;
+      background: #010a0f;
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 32px;
+      margin-top: 8px;
+      margin-bottom: 12px;
+    }
+    .param-unit {
+      font-size: 0.9rem;
+      color: #7dd3fc;
+    }
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      background: #1e3a3f;
+      border-radius: 10px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: #facc15;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 8px #ffd966;
+      border: 1px solid #fde047;
+    }
+    .star-stats {
+      background: #010e12;
+      border-radius: 1.5rem;
+      padding: 1rem;
+      margin-top: 12px;
+      border: 1px solid #115e59;
+    }
+    .stat-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      color: #67e8f9;
+    }
+    .stat-number {
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #fcd34d;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .dexter-btn {
+      flex: 1;
+      background: #0c2e2b;
+      border: none;
+      border-radius: 60px;
+      padding: 10px;
+      color: #ccfbf1;
+      font-weight: bold;
+      font-family: monospace;
+      cursor: pointer;
+      transition: 0.1s linear;
+      border-bottom: 2px solid #2dd4bf;
+    }
+    .dexter-btn:active {
+      transform: translateY(2px);
+    }
+
+    .key-hint {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #2dd4bf40;
+      font-size: 0.7rem;
+      color: #6ee7d6;
+    }
+    kbd {
+      background: #00000080;
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-weight: bold;
+      color: #facc15;
+      margin: 0 4px;
+      border: 1px solid #2dd4bf;
+    }
+
+    @media (max-width: 780px) {
+      .diagram-area { min-width: 280px; }
+      canvas { width: 100%; height: auto; }
+    }
+  </style>
+</head>
+<body>
+<div class="dexter-lab">
+  <div class="lab-header">
+    <div class="title">
+      <h1>🧬 DEXTER'S LAB · STELLAR GENETICS CONSOLE</h1>
+      <p>H-R Diagram Simulator | Luminosity vs Temperature | Main Sequence Engine</p>
+    </div>
+    <div class="badge">⚡ Q/E cycle | A/D adjust | H-click | SPACE reset view</div>
+  </div>
+
+  <div class="hr-dashboard">
+    <!-- CANVAS: HR DIAGRAM -->
+    <div class="diagram-area">
+      <canvas id="hrCanvas" width="600" height="500" style="width:100%; height:auto; max-width:600px; aspect-ratio:600/500"></canvas>
+      <div class="diagram-caption">↓ LUMINOSITY (L☉)  →  TEMPERATURE (K) →  </div>
+    </div>
+
+    <!-- CONTROL PANEL: Twin sliders + star data -->
+    <div class="control-panel">
+      <!-- Temperature Card -->
+      <div class="param-card" id="tempCard">
+        <div class="param-header">
+          <div class="param-icon">🌡️</div>
+          <div class="param-label">EFFECTIVE TEMPERATURE</div>
+        </div>
+        <div><span class="param-value" id="tempValue">5778</span> <span class="param-unit">Kelvin</span></div>
+        <input type="range" id="tempSlider" min="3000" max="30000" step="50" value="5778">
+      </div>
+
+      <!-- Luminosity Card -->
+      <div class="param-card" id="lumCard">
+        <div class="param-header">
+          <div class="param-icon">✨</div>
+          <div class="param-label">LUMINOSITY (L☉)</div>
+        </div>
+        <div><span class="param-value" id="lumValue">1.00</span> <span class="param-unit">solar units</span></div>
+        <input type="range" id="lumSlider" min="0.01" max="120000" step="50" value="1">
+        <small style="color:#6ee7d6; display:block; margin-top:6px;">⚠️ log scale slider</small>
+      </div>
+
+      <!-- Derived Stellar Properties (Radius, Mass, Spectral Class) -->
+      <div class="star-stats">
+        <div class="stat-grid">
+          <div class="stat"><div class="stat-label">📏 RADIUS (R☉)</div><div class="stat-number" id="radiusValue">1.00</div></div>
+          <div class="stat"><div class="stat-label">⚖️ MASS (M☉)</div><div class="stat-number" id="massValue">1.00</div></div>
+          <div class="stat"><div class="stat-label">🔭 SPECTRAL TYPE</div><div class="stat-number" id="specType">G2V</div></div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="dexter-btn" id="mainSeqBtn">🌟 FIT TO MAIN SEQUENCE</button>
+        <button class="dexter-btn" id="resetSunBtn">☀️ RESET TO SUN</button>
+      </div>
+      <div class="key-hint">
+        <span><kbd>Q / E</kbd> cycle control (TEMP ↔ LUM)</span>
+        <span><kbd>A / D</kbd> adjust selected parameter</span>
+        <span><kbd>H</kbd> "click" active slider</span>
+        <span><kbd>SPACE</kbd> reset view</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    // ----- CONSTANTS -----
+    const canvas = document.getElementById('hrCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = 600, height = 500;
+    canvas.width = width;
+    canvas.height = height;
+
+    // Stellar reference point: The Sun
+    let temperature = 5778;   // K
+    let luminosity = 1.0;     // L☉
+
+    // UI elements
+    const tempSlider = document.getElementById('tempSlider');
+    const lumSlider = document.getElementById('lumSlider');
+    const tempValueSpan = document.getElementById('tempValue');
+    const lumValueSpan = document.getElementById('lumValue');
+    const radiusSpan = document.getElementById('radiusValue');
+    const massSpan = document.getElementById('massValue');
+    const spectralSpan = document.getElementById('specType');
+
+    const tempCard = document.getElementById('tempCard');
+    const lumCard = document.getElementById('lumCard');
+
+    // Active control: 0 = Temperature, 1 = Luminosity
+    let activeParam = 0;   // 0:temp, 1:lum
+
+    // ----- Helper: convert luminosity to log10 scale for slider (makes UI smooth)
+    function lumToSliderValue(lum) {
+      return Math.log10(lum) * 1000;  // 0.01 L☉ => -2 → -2000, but we clamp
+    }
+    function sliderToLum(sliderVal) {
+      return Math.pow(10, sliderVal / 1000);
+    }
+
+    // Update sliders based on internal luminosity/temp
+    function syncSliders() {
+      tempSlider.value = temperature;
+      tempValueSpan.innerText = Math.round(temperature);
+      // convert luminosity to logarithmic slider
+      let logLum = Math.log10(luminosity);
+      let sliderRaw = logLum * 1000;
+      sliderRaw = Math.min(8000, Math.max(-2000, sliderRaw)); // from 0.01 to 1e8
+      lumSlider.value = sliderRaw;
+      lumValueSpan.innerText = luminosity.toExponential(2);
+    }
+
+    // ---- PHYSICS: Radius (Stefan-Boltzmann) L = R^2 * T^4  (in solar units) ----
+    function computeRadius(T, L) {
+      // L/Lsun = (R/Rsun)^2 * (T/Tsun)^4  => R = sqrt( L / (T_rel^4) )
+      const Tsun = 5778;
+      const T_rel = T / Tsun;
+      const R = Math.sqrt(L / Math.pow(T_rel, 4));
+      return Math.min(500, Math.max(0.1, R));   // clamp visually
+    }
+
+    // Approximate mass-luminosity relation for main sequence (rough, but educational)
+    function estimateMass(L, R, T) {
+      // Simple piecewise: L ∝ M^3.5 for main sequence, but for giant branches we use radius relation fallback
+      let mass = Math.pow(L, 1/3.5);
+      if (mass < 0.08) mass = 0.08;
+      if (mass > 120) mass = 120;
+      // additional correction for white dwarfs / giants?
+      if (R > 20 && L < 500) mass = 0.6;        // red giant branch simplified
+      if (R < 0.05) mass = 0.4;
+      return Math.round(mass * 100) / 100;
+    }
+
+    function getSpectralType(T) {
+      if (T >= 30000) return 'O5V';
+      if (T >= 10000) return 'B5V';
+      if (T >= 7500) return 'A5V';
+      if (T >= 6000) return 'F5V';
+      if (T >= 5200) return 'G2V';
+      if (T >= 3800) return 'K5V';
+      return 'M5V';
+    }
+
+    function updateStarStats() {
+      const radius = computeRadius(temperature, luminosity);
+      const mass = estimateMass(luminosity, radius, temperature);
+      const spec = getSpectralType(temperature);
+      radiusSpan.innerText = radius.toFixed(2);
+      massSpan.innerText = mass.toFixed(2);
+      spectralSpan.innerText = spec;
+    }
+
+    // ----- draw HR diagram (axes: X = Temperature (log decreasing), Y = Luminosity (log) ) -----
+    function drawHRDiagram() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "#01050f";
+      ctx.fillRect(0, 0, width, height);
+      
+      // define margins
+      const leftMargin = 70, rightMargin = 30, topMargin = 40, bottomMargin = 60;
+      const plotWidth = width - leftMargin - rightMargin;
+      const plotHeight = height - topMargin - bottomMargin;
+      
+      // Axes ranges: Temperature from 30000 K to 3000 K (decreasing X)
+      const maxTemp = 30000;
+      const minTemp = 3000;
+      const maxLum = 1e5;    // 100,000 L☉
+      const minLum = 1e-4;    // 0.0001 L☉
+      
+      function mapX(temp) {
+        // log scale for temperature? Usually HR diagram uses log T but we use linear-ish in log scale? Let's do semi-log: X = left + (log10(T) - log10(minTemp))/(log10(maxTemp)-log10(minTemp)) * plotWidth
+        const logT = Math.log10(temp);
+        const logMin = Math.log10(minTemp);
+        const logMax = Math.log10(maxTemp);
+        const t = (logT - logMin) / (logMax - logMin);
+        return leftMargin + (1 - t) * plotWidth;   // reverse direction: hot left, cool right
+      }
+      
+      function mapY(lum) {
+        const logL = Math.log10(lum);
+        const logMin = Math.log10(minLum);
+        const logMax = Math.log10(maxLum);
+        const frac = (logL - logMin) / (logMax - logMin);
+        return topMargin + plotHeight - (frac * plotHeight);
+      }
+      
+      // draw axes lines
+      ctx.strokeStyle = "#3b9e90";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(leftMargin, topMargin);
+      ctx.lineTo(leftMargin, topMargin + plotHeight);
+      ctx.lineTo(leftMargin + plotWidth, topMargin + plotHeight);
+      ctx.stroke();
+      
+      // Labels & ticks
+      ctx.fillStyle = "#94f0e0";
+      ctx.font = "10px monospace";
+      // X axis: temperature labels (hot -> cool)
+      const tempTicks = [30000, 20000, 10000, 7000, 5000, 3500];
+      for(let t of tempTicks) {
+        let x = mapX(t);
+        ctx.fillText(t + "K", x-22, topMargin + plotHeight + 18);
+        ctx.beginPath();
+        ctx.moveTo(x, topMargin + plotHeight-5);
+        ctx.lineTo(x, topMargin + plotHeight+2);
+        ctx.stroke();
+      }
+      ctx.fillText("Temperature (K) →", leftMargin + plotWidth/2 - 70, topMargin + plotHeight + 35);
+      
+      // Y axis: luminosity ticks
+      const lumTicks = [1e-4, 1e-2, 1, 1e2, 1e4, 1e5];
+      for(let l of lumTicks) {
+        let y = mapY(l);
+        if(y >= topMargin && y <= topMargin+plotHeight) {
+          ctx.fillText(l.toExponential(0), leftMargin-45, y+3);
+          ctx.beginPath();
+          ctx.moveTo(leftMargin-4, y);
+          ctx.lineTo(leftMargin+2, y);
+          ctx.stroke();
+        }
+      }
+      ctx.save();
+      ctx.translate(20, topMargin+plotHeight/2);
+      ctx.rotate(-Math.PI/2);
+      ctx.fillText("Luminosity (L☉)", -20, 10);
+      ctx.restore();
+      
+      // Draw main sequence band (conceptual)
+      ctx.beginPath();
+      for(let i=0; i<=100; i++) {
+        let tempSeq = 30000 - (i/100)*(27000);
+        let logLumSeq = 4.5 * (Math.log10(tempSeq) - Math.log10(5778)) + 0;
+        let lumSeq = Math.pow(10, logLumSeq);
+        lumSeq = Math.min(maxLum, Math.max(minLum, lumSeq));
+        let x = mapX(tempSeq);
+        let y = mapY(lumSeq);
+        if(i===0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle = "#b0f3b080";
+      ctx.lineWidth = 2.8;
+      ctx.setLineDash([8,6]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#aaf0e0aa";
+      ctx.font = "bold 10px monospace";
+      ctx.fillText("Main Sequence", mapX(10000)-20, mapY(80)-12);
+      
+      // draw current star position
+      const starX = mapX(temperature);
+      const starY = mapY(luminosity);
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = "#facc15";
+      ctx.beginPath();
+      ctx.arc(starX, starY, 10, 0, 2*Math.PI);
+      ctx.fillStyle = "#facc15";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(starX, starY, 4, 0, 2*Math.PI);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      
+      // label if needed
+      ctx.fillStyle = "#fde047";
+      ctx.font = "bold 12px monospace";
+      ctx.fillText("★ CURRENT STAR", starX+10, starY-6);
+    }
+    
+    // ---- Update all parameters, sliders, stats and diagram ----
+    function fullUpdate() {
+      syncSliders();
+      updateStarStats();
+      drawHRDiagram();
+    }
+    
+    // Set temperature with safety clamp
+    function setTemperature(val) {
+      temperature = Math.min(30000, Math.max(3000, val));
+      fullUpdate();
+    }
+    
+    // Set luminosity
+    function setLuminosity(val) {
+      luminosity = Math.min(120000, Math.max(0.008, val));
+      fullUpdate();
+    }
+    
+    // --- Main Sequence fit: adjust temperature to match luminosity relation ---
+    function fitToMainSequence() {
+      // For a given luminosity, approximate temperature from main seq: L ∝ T^4.5 (rough)
+      let newTemp = 5778 * Math.pow(luminosity, 1/4.5);
+      newTemp = Math.min(30000, Math.max(3000, newTemp));
+      temperature = newTemp;
+      fullUpdate();
+    }
+    
+    function resetToSun() {
+      temperature = 5778;
+      luminosity = 1.0;
+      fullUpdate();
+    }
+    
+    // ---- EVENT HANDLERS for sliders ----
+    tempSlider.addEventListener('input', (e) => {
+      setTemperature(parseFloat(e.target.value));
+    });
+    lumSlider.addEventListener('input', (e) => {
+      let sliderRaw = parseFloat(e.target.value);
+      let lumValue = sliderToLum(sliderRaw);
+      setLuminosity(lumValue);
+    });
+    
+    // ---- UI active state styling & keyboard navigation (Q/E, A/D, H, Space) ----
+    function setActiveParameter(index) {
+      activeParam = index;
+      if(activeParam === 0) {
+        tempCard.classList.add('active');
+        lumCard.classList.remove('active');
+      } else {
+        lumCard.classList.add('active');
+        tempCard.classList.remove('active');
+      }
+    }
+    
+    // Adjust active parameter with delta
+    function adjustActive(delta) {
+      if(activeParam === 0) {
+        let newTemp = temperature + delta * 150;
+        setTemperature(newTemp);
+      } else {
+        let logLum = Math.log10(luminosity);
+        let newLog = logLum + delta * 0.03;
+        newLog = Math.min(5.08, Math.max(-2.5, newLog)); // 1e5 to 0.003
+        let newLum = Math.pow(10, newLog);
+        setLuminosity(newLum);
+      }
+    }
+    
+    // "H" click: trigger the active parameter's slider focus and click effect
+    function triggerActiveClick() {
+      if(activeParam === 0) {
+        tempSlider.focus();
+        tempSlider.dispatchEvent(new Event('input'));
+      } else {
+        lumSlider.focus();
+        lumSlider.dispatchEvent(new Event('input'));
+      }
+    }
+    
+    // keyboard listeners
+    window.addEventListener('keydown', (e) => {
+      const key = e.key.toLowerCase();
+      if (key === 'q' || key === 'e') {
+        e.preventDefault();
+        let next = activeParam === 0 ? 1 : 0;
+        setActiveParameter(next);
+      }
+      if (key === 'a') {
+        e.preventDefault();
+        adjustActive(-1);
+      }
+      if (key === 'd') {
+        e.preventDefault();
+        adjustActive(1);
+      }
+      if (key === 'h') {
+        e.preventDefault();
+        triggerActiveClick();
+      }
+      if (key === ' ') {
+        e.preventDefault();
+        resetToSun();
+      }
+    });
+    
+    // card click sets active parameter as well
+    tempCard.addEventListener('click', () => setActiveParameter(0));
+    lumCard.addEventListener('click', () => setActiveParameter(1));
+    
+    // Buttons
+    document.getElementById('mainSeqBtn').addEventListener('click', fitToMainSequence);
+    document.getElementById('resetSunBtn').addEventListener('click', resetToSun);
+    
+    // initial active: Temperature
+    setActiveParameter(0);
+    fullUpdate();
+    // handle window resize -> redraw
+    window.addEventListener('resize', () => drawHRDiagram());
+  })();
+</script>
+</body>
+</html>
