@@ -23,7 +23,6 @@ import DiodeBiasLab from "./components/PN-JunctionDiodeShwoing";
 import PNJunctionDiffusion from "./components/PNJunctionDIode";
 import CSLab from "./components/CSLab";
 import RoboticsLab from "./components/RoboticsAutomationLab";
-import IoTLab from "./components/IoT";
 import "./App.css";
 
 /* ==============================
@@ -83,7 +82,6 @@ function DexterHome() {
         case "0": navigate("/mathemetics"); break;
         case "-": navigate("/cs"); break;
         case "=": navigate("/robotics"); break;
-        case "p": navigate("/iot"); break; // Key binding for IoT Lab
         default: break;
       }
     };
@@ -228,9 +226,7 @@ export default function App() {
         <Route path="/cs" element={<CSLab />} />
         <Route path="/robotics" element={<RoboticsLab />} />
         
-        {/* Parametric Route Handlers for the nested configurations */}
-        <Route path="/iot" element={<IoTLab />} />
-        <Route path="/iot/:labId" element={<IoTLab />} />
+     
       </Routes>
     </Router>
   );
