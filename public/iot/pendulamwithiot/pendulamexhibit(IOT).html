@@ -1,0 +1,222 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>⚡ Real Pendulum (YOLO Synced)</title>
+<style>
+    body {
+        margin: 0;
+        background: #0a1428;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: white;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .panel {
+        display: flex;
+        gap: 25px;
+        background: rgba(20, 40, 70, 0.4);
+        padding: 30px;
+        border-radius: 20px;
+        border: 1px solid #2e6090;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    canvas {
+        background: #0b1429;
+        border: 2px solid #2e6090;
+        border-radius: 12px;
+    }
+
+    .right {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 320px;
+    }
+
+    .data-card {
+        background: #142a40;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #3f78b0;
+    }
+
+    .bar {
+        height: 12px;
+        background: #050a15;
+        border-radius: 6px;
+        overflow: hidden;
+        margin: 8px 0 15px 0;
+        border: 1px solid #1e3f60;
+    }
+
+    .fill {
+        height: 100%;
+        width: 0%;
+        transition: width 0.1s ease-out;
+    }
+
+    .ke-fill { background: #00ff88; box-shadow: 0 0 10px #00ff88; }
+    .pe-fill { background: #00d4ff; box-shadow: 0 0 10px #00d4ff; }
+
+    .label { font-size: 0.85rem; color: #88aadd; text-transform: uppercase; }
+    .value { font-family: monospace; font-size: 1.1rem; color: white; float: right; }
+</style>
+</head>
+
+<body>
+
+<div class="panel">
+    <canvas id="pendulum" width="300" height="350"></canvas>
+
+    <div class="right">
+        <canvas id="graph" width="300" height="180"></canvas>
+
+        <div class="data-card">
+            <div>
+                <span class="label">Kinetic Energy</span>
+                <span class="value" id="ke">0.00</span>
+                <div class="bar"><div id="keBar" class="fill ke-fill"></div></div>
+            </div>
+
+            <div>
+                <span class="label">Potential Energy</span>
+                <span class="value" id="pe">0.00</span>
+                <div class="bar"><div id="peBar" class="fill pe-fill"></div></div>
+            </div>
+
+            <div style="margin-top: 10px; border-top: 1px solid #2e6090; padding-top: 10px;">
+                <span class="label">Total Energy</span>
+                <span class="value" id="te" style="color: #ffd700;">0.00</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const g = 9.81;
+const mass = 1;
+
+let theta = 0;
+let omega = 0;
+let length = 0;
+let hasData = false;
+let energyData = [];
+
+const pCanvas = document.getElementById("pendulum");
+const gCanvas = document.getElementById("graph");
+const pctx = pCanvas.getContext("2d");
+const gctx = gCanvas.getContext("2d");
+
+const keText = document.getElementById("ke"), peText = document.getElementById("pe"), teText = document.getElementById("te");
+const keBar = document.getElementById("keBar"), peBar = document.getElementById("peBar");
+
+/* --- WEBSOCKET --- */
+const socket = new WebSocket("ws://127.0.0.1:8765");
+
+socket.onmessage = (e) => {
+    try {
+        const d = JSON.parse(e.data);
+        if (d.detected && isFinite(d.theta)) {
+            theta = d.theta;
+            omega = d.omega || 0;
+            length = Math.abs(d.length) || 0;
+            hasData = true;
+        }
+    } catch (err) { console.error("Socket error", err); }
+};
+
+function animate() {
+    pctx.clearRect(0, 0, 300, 350);
+    gctx.clearRect(0, 0, 300, 180);
+
+    if (hasData && isFinite(theta) && isFinite(length)) {
+        
+        /* 1. PHYSICS MATH */
+        // Height = L * (1 - cos(theta))
+        const h = length * (1 - Math.cos(theta));
+        const PE = Math.max(0, mass * g * h);
+        
+        // v = omega * length
+        const v = omega * length;
+        const KE = 0.5 * mass * (v * v);
+        const TE = KE + PE;
+
+        energyData.push({KE, PE});
+        if (energyData.length > 300) energyData.shift();
+
+        /* 2. UI UPDATE */
+        keText.textContent = KE.toFixed(2);
+        peText.textContent = PE.toFixed(2);
+        teText.textContent = TE.toFixed(2);
+        if (TE > 0) {
+            keBar.style.width = (KE / TE * 100) + "%";
+            peBar.style.width = (PE / TE * 100) + "%";
+        }
+
+        /* 3. DRAW PENDULUM */
+        const ox = 150, oy = 50; 
+        const scale = 140; // Reduced string size to keep bob visible
+
+        // Position: 0 radians is down. Math.cos(theta) keeps it below oy.
+        const x = ox + (length * scale) * Math.sin(theta);
+        const y = oy + (length * scale) * Math.abs(Math.cos(theta));
+
+        if (isFinite(x) && isFinite(y)) {
+            // String
+            pctx.strokeStyle = "#556688";
+            pctx.lineWidth = 2;
+            pctx.beginPath(); pctx.moveTo(ox, oy); pctx.lineTo(x, y); pctx.stroke();
+
+            // Metallic Bob (Silver Gradient)
+            const bobRad = 15;
+            const grad = pctx.createRadialGradient(x-5, y-5, 2, x, y, bobRad);
+            grad.addColorStop(0, '#ffffff'); 
+            grad.addColorStop(0.5, '#c0c0c0'); 
+            grad.addColorStop(1, '#333333'); 
+            
+            pctx.fillStyle = grad;
+            pctx.beginPath(); pctx.arc(x, y, bobRad, 0, Math.PI*2); pctx.fill();
+
+            // Pivot
+            pctx.fillStyle = "white";
+            pctx.beginPath(); pctx.arc(ox, oy, 5, 0, 7); pctx.fill();
+        }
+
+        /* 4. DRAW GRAPH */
+        gctx.lineWidth = 2;
+        // KE Line
+        gctx.strokeStyle = "#00ff88";
+        gctx.beginPath();
+        energyData.forEach((d, i) => {
+            const gy = 160 - (d.KE * 15); // Scaled for visibility
+            if (i === 0) gctx.moveTo(i, gy); else gctx.lineTo(i, gy);
+        });
+        gctx.stroke();
+
+        // PE Line
+        gctx.strokeStyle = "#00d4ff";
+        gctx.beginPath();
+        energyData.forEach((d, i) => {
+            const gy = 160 - (d.PE * 15);
+            if (i === 0) gctx.moveTo(i, gy); else gctx.lineTo(i, gy);
+        });
+        gctx.stroke();
+
+    } else {
+        pctx.fillStyle = "#556688";
+        pctx.textAlign = "center";
+        pctx.fillText("WAITING FOR YOLO STREAM...", 150, 175);
+    }
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+</body>
+</html>

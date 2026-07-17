@@ -1,0 +1,455 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>⚡ Real Pendulum — Physics Visualiser</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #0a1428;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: white;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+
+  .panel {
+    display: flex;
+    gap: 20px;
+    background: rgba(20, 40, 70, 0.45);
+    padding: 24px;
+    border-radius: 18px;
+    border: 1px solid #2e6090;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  canvas {
+    background: #0b1429;
+    border: 1.5px solid #2e6090;
+    border-radius: 10px;
+    display: block;
+  }
+
+  .right {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 310px;
+  }
+
+  .data-card {
+    background: #0f2035;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid #2a5a88;
+  }
+
+  .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .label { font-size: 0.78rem; color: #7aacdd; text-transform: uppercase; letter-spacing: 0.05em; }
+  .val   { font-family: monospace; font-size: 1.05rem; }
+
+  .bar-wrap {
+    height: 9px;
+    background: #040c1c;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 3px 0 12px;
+    border: 1px solid #1a3a58;
+  }
+  .fill    { height: 100%; width: 0%; transition: width 0.08s ease-out; border-radius: 5px; }
+  .ke-fill { background: #00e87a; box-shadow: 0 0 6px #00e87a88; }
+  .pe-fill { background: #00c8f0; box-shadow: 0 0 6px #00c8f088; }
+
+  .divider { border: none; border-top: 1px solid #1e4060; margin: 8px 0; }
+
+  .status {
+    text-align: center;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-top: 2px;
+    transition: background 0.3s, color 0.3s;
+  }
+  .status.live    { background: #0d2e1a; color: #00e87a; border: 1px solid #006e36; }
+  .status.waiting { background: #2a1e00; color: #f0a000; border: 1px solid #805000; }
+  .status.left    { background: #0a1e30; color: #00c8f0; border: 1px solid #006888; }
+  .status.right   { background: #2a0a0a; color: #ff6060; border: 1px solid #882020; }
+</style>
+</head>
+
+<body>
+<div class="panel">
+  <canvas id="pendulum" width="280" height="340"></canvas>
+
+  <div class="right">
+    <canvas id="graph" width="310" height="160"></canvas>
+
+    <div class="data-card">
+      <div class="row"><span class="label">Kinetic Energy (J)</span><span class="val" id="ke" style="color:#00e87a">0.000</span></div>
+      <div class="bar-wrap"><div id="keBar" class="fill ke-fill"></div></div>
+
+      <div class="row"><span class="label">Potential Energy (J)</span><span class="val" id="pe" style="color:#00c8f0">0.000</span></div>
+      <div class="bar-wrap"><div id="peBar" class="fill pe-fill"></div></div>
+
+      <hr class="divider">
+      <div class="row">
+        <span class="label">Total Energy (J)</span>
+        <span class="val" id="te" style="color:#ffd700">0.000</span>
+      </div>
+
+      <hr class="divider" style="margin-top:6px">
+      <div class="row">
+        <span class="label">Angle</span>
+        <span class="val" id="angle" style="color:#ccc">0.0°</span>
+      </div>
+      <div class="row">
+        <span class="label">ω (rad/s)</span>
+        <span class="val" id="omega" style="color:#ccc">0.00</span>
+      </div>
+      <div class="row">
+        <span class="label">Length (m)</span>
+        <span class="val" id="length" style="color:#ccc">—</span>
+      </div>
+
+      <div id="statusBadge" class="status waiting">⏳ Waiting for detection</div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden capture elements -->
+<video id="captureVideo" style="display:none;" autoplay playsinline></video>
+<canvas id="captureCanvas" style="display:none;"></canvas>
+
+<script>
+const g    = 9.81;
+const mass = 1.0;
+
+let theta   = 0;
+let omega   = 0;
+let length  = 0.5;
+let hasData = false;
+
+const energyHistory = [];
+const MAX_HIST = 300;
+let graphMaxE  = 0.01;
+
+const pCanvas = document.getElementById("pendulum");
+const gCanvas = document.getElementById("graph");
+const pctx    = pCanvas.getContext("2d");
+const gctx    = gCanvas.getContext("2d");
+
+const keEl     = document.getElementById("ke");
+const peEl     = document.getElementById("pe");
+const teEl     = document.getElementById("te");
+const angleEl  = document.getElementById("angle");
+const omegaEl  = document.getElementById("omega");
+const lengthEl = document.getElementById("length");
+const keBar    = document.getElementById("keBar");
+const peBar    = document.getElementById("peBar");
+const badge    = document.getElementById("statusBadge");
+
+// ── WebSocket & camera capture ───────────────────────────────────────────────
+// ✅ Use the deployed backend URL (wss://)
+const WS_URL = "wss://pendulamiotlabbckend.onrender.com/ws";
+const socket = new WebSocket(WS_URL);
+
+const captureVideo = document.getElementById("captureVideo");
+const captureCanvas = document.getElementById("captureCanvas");
+captureCanvas.width = 640;
+captureCanvas.height = 480;
+const captureCtx = captureCanvas.getContext("2d");
+let sendInterval = null;
+
+// Start webcam stream (asks for permission)
+async function initCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { width: 640, height: 480 }
+    });
+    captureVideo.srcObject = stream;
+  } catch (err) {
+    console.error("Camera access denied or not available:", err);
+    badge.className = "status waiting";
+    badge.textContent = "⚠️ Camera unavailable";
+  }
+}
+
+// Send frames to backend 15 times per second
+function startSendingFrames() {
+  if (sendInterval) clearInterval(sendInterval);
+  sendInterval = setInterval(() => {
+    if (!captureVideo.videoWidth || socket.readyState !== WebSocket.OPEN) return;
+
+    // Draw current video frame onto hidden canvas
+    captureCtx.drawImage(captureVideo, 0, 0, 640, 480);
+    // Convert to JPEG blob and send
+    captureCanvas.toBlob(
+      (blob) => {
+        if (blob && socket.readyState === WebSocket.OPEN) {
+          socket.send(blob);
+        }
+      },
+      "image/jpeg",
+      0.7
+    );
+  }, 1000 / 15);
+}
+
+// ── WebSocket event handlers ─────────────────────────────────────────────────
+socket.onopen = () => {
+  console.log("WebSocket connected to " + WS_URL);
+  initCamera();
+  startSendingFrames();
+};
+
+socket.onmessage = (e) => {
+  try {
+    const d = JSON.parse(e.data);
+    if (d.detected && isFinite(d.theta)) {
+      theta   = d.theta;
+      omega   = isFinite(d.omega)  ? d.omega  : 0;
+      length  = (isFinite(d.length) && d.length > 0) ? d.length : 0.5;
+      hasData = true;
+    } else {
+      hasData = false;
+    }
+  } catch (err) { console.error(err); }
+};
+
+socket.onerror = () => {
+  badge.className   = "status waiting";
+  badge.textContent = "⚠️ WebSocket error — is the Python server running?";
+};
+
+socket.onclose = () => {
+  if (sendInterval) clearInterval(sendInterval);
+  console.log("WebSocket closed");
+};
+
+// ── Pendulum drawing ─────────────────────────────────────────────────────────
+function drawPendulum() {
+  const W = pCanvas.width, H = pCanvas.height;
+  pctx.clearRect(0, 0, W, H);
+
+  const ox = W / 2;   // pivot x — horizontal centre
+  const oy = 45;      // pivot y — near top
+
+  if (!hasData) {
+    // Ghost pendulum at rest
+    pctx.strokeStyle = "rgba(80,120,180,0.25)";
+    pctx.lineWidth   = 1.5;
+    pctx.beginPath();
+    pctx.moveTo(ox, oy);
+    pctx.lineTo(ox, oy + 200);
+    pctx.stroke();
+    pctx.fillStyle = "rgba(80,120,180,0.2)";
+    pctx.beginPath();
+    pctx.arc(ox, oy + 200, 12, 0, Math.PI * 2);
+    pctx.fill();
+    pctx.fillStyle = "#556688";
+    pctx.font = "13px monospace";
+    pctx.textAlign = "center";
+    pctx.fillText("Waiting for YOLO…", ox, H - 30);
+    pctx.textAlign = "left";
+    return;
+  }
+
+  const maxPx     = H - oy - 28;
+  const scaledLen = Math.min(length * 240, maxPx);
+
+  // Bob position — theta=0 is straight down, positive theta = right
+  const bobX = ox + scaledLen * Math.sin(theta);
+  const bobY = oy + scaledLen * Math.cos(theta);
+
+  // Dashed reference line (straight down)
+  pctx.strokeStyle = "rgba(80,130,200,0.18)";
+  pctx.lineWidth   = 1;
+  pctx.setLineDash([4, 4]);
+  pctx.beginPath();
+  pctx.moveTo(ox, oy);
+  pctx.lineTo(ox, oy + scaledLen);
+  pctx.stroke();
+  pctx.setLineDash([]);
+
+  // String
+  pctx.strokeStyle = "#7a99cc";
+  pctx.lineWidth   = 2;
+  pctx.beginPath();
+  pctx.moveTo(ox, oy);
+  pctx.lineTo(bobX, bobY);
+  pctx.stroke();
+
+  // ── Angle arc ──────────────────────────────────────────────────────────────
+  if (Math.abs(theta) > 0.03) {
+    const arcR     = 36;
+    const downAngle  = Math.PI / 2;            // straight down in canvas coords
+    const stringAngle = Math.PI / 2 - theta;  // actual string direction
+
+    pctx.beginPath();
+    // Always draw from downAngle to stringAngle.
+    pctx.arc(ox, oy, arcR, stringAngle, downAngle, theta > 0);
+    pctx.strokeStyle = theta > 0
+      ? "rgba(255, 90, 90, 0.7)"   // red for right
+      : "rgba(90, 200, 255, 0.7)"; // blue for left
+    pctx.lineWidth = 2;
+    pctx.stroke();
+
+    // Angle label — place it halfway between the two arc endpoints
+    const midAngle = Math.PI / 2 - theta / 2;  // canvas angle at arc midpoint
+    const labelR   = arcR + 18;
+    const lx = ox + labelR * Math.cos(midAngle);
+    const ly = oy + labelR * Math.sin(midAngle);
+    pctx.fillStyle = "#ffd700";
+    pctx.font      = "bold 11px monospace";
+    pctx.textAlign = "center";
+    pctx.fillText(Math.abs(theta * 180 / Math.PI).toFixed(1) + "°", lx, ly);
+    pctx.textAlign = "left";
+  }
+
+  // ── Bob ────────────────────────────────────────────────────────────────────
+  const bobR = 13;
+  pctx.shadowBlur  = 8;
+  pctx.shadowColor = theta >  0.08 ? "rgba(255,80,80,0.5)"
+                   : theta < -0.08 ? "rgba(80,200,255,0.5)"
+                   :                 "rgba(200,200,200,0.3)";
+
+  const grad = pctx.createRadialGradient(bobX - 4, bobY - 4, 3, bobX, bobY, bobR);
+  grad.addColorStop(0,    "#ffffff");
+  grad.addColorStop(0.45, theta >  0.08 ? "#ff6060"
+                        : theta < -0.08 ? "#44aaff"
+                        :                 "#b0b0c0");
+  grad.addColorStop(1,    "#444466");
+
+  pctx.fillStyle = grad;
+  pctx.beginPath();
+  pctx.arc(bobX, bobY, bobR, 0, Math.PI * 2);
+  pctx.fill();
+
+  pctx.shadowBlur = 0;
+  pctx.fillStyle  = "rgba(255,255,255,0.55)";
+  pctx.beginPath();
+  pctx.arc(bobX - 4, bobY - 4, 4, 0, Math.PI * 2);
+  pctx.fill();
+
+  // Pivot
+  pctx.fillStyle = "#ffd700";
+  pctx.beginPath();
+  pctx.arc(ox, oy, 7, 0, Math.PI * 2);
+  pctx.fill();
+  pctx.fillStyle = "#fffbe0";
+  pctx.beginPath();
+  pctx.arc(ox, oy, 3, 0, Math.PI * 2);
+  pctx.fill();
+}
+
+// ── Energy graph ─────────────────────────────────────────────────────────────
+function drawGraph() {
+  const W = gCanvas.width, H = gCanvas.height;
+  gctx.clearRect(0, 0, W, H);
+
+  if (energyHistory.length < 2) return;
+
+  // Grid lines
+  gctx.strokeStyle = "rgba(60,100,160,0.2)";
+  gctx.lineWidth   = 0.5;
+  for (let i = 0; i <= 4; i++) {
+    const y = i * (H / 4);
+    gctx.beginPath(); gctx.moveTo(0, y); gctx.lineTo(W, y); gctx.stroke();
+  }
+
+  const scaleY = (v) => H - 8 - Math.min(H - 16, (v / graphMaxE) * (H - 16));
+
+  const drawLine = (key, color) => {
+    gctx.strokeStyle = color;
+    gctx.lineWidth   = 1.8;
+    gctx.beginPath();
+    let started = false;
+    energyHistory.forEach((d, i) => {
+      const x = (i / (MAX_HIST - 1)) * W;
+      const y = scaleY(d[key]);
+      if (!started) { gctx.moveTo(x, y); started = true; }
+      else            gctx.lineTo(x, y);
+    });
+    gctx.stroke();
+  };
+
+  drawLine("KE", "#00e87a");
+  drawLine("PE", "#00c8f0");
+
+  gctx.font = "10px monospace";
+  gctx.fillStyle = "#00e87a"; gctx.fillText("KE", 6, 14);
+  gctx.fillStyle = "#00c8f0"; gctx.fillText("PE", 6, 28);
+
+  gctx.fillStyle = "rgba(130,160,200,0.7)";
+  gctx.font      = "9px monospace";
+  gctx.textAlign = "right";
+  gctx.fillText(graphMaxE.toFixed(3) + " J", W - 3, 11);
+  gctx.textAlign = "left";
+}
+
+// ── Animation loop ────────────────────────────────────────────────────────────
+function animate() {
+  if (hasData && isFinite(theta) && isFinite(length) && length > 0) {
+    // PE: height above lowest point
+    const h  = length * (1 - Math.cos(theta));
+    const PE = Math.max(0, mass * g * h);
+
+    // KE: v = ω × L
+    const v  = omega * length;
+    const KE = 0.5 * mass * v * v;
+    const TE = KE + PE;
+
+    energyHistory.push({ KE, PE });
+    if (energyHistory.length > MAX_HIST) energyHistory.shift();
+
+    // Auto-scale graph Y axis
+    if (TE > graphMaxE) graphMaxE = TE * 1.1;
+    graphMaxE = Math.max(graphMaxE * 0.9995, 0.01);  // slow decay
+
+    const angleDeg = theta * 180 / Math.PI;
+    keEl.textContent     = KE.toFixed(3);
+    peEl.textContent     = PE.toFixed(3);
+    teEl.textContent     = TE.toFixed(3);
+    angleEl.textContent  = angleDeg.toFixed(1) + "°";
+    omegaEl.textContent  = omega.toFixed(3);
+    lengthEl.textContent = length.toFixed(3) + " m";
+
+    if (TE > 1e-5) {
+      keBar.style.width = Math.min(100, (KE / TE) * 100).toFixed(1) + "%";
+      peBar.style.width = Math.min(100, (PE / TE) * 100).toFixed(1) + "%";
+    }
+
+    if (angleDeg > 5) {
+      badge.className   = "status right";
+      badge.textContent = "→ Swinging right";
+    } else if (angleDeg < -5) {
+      badge.className   = "status left";
+      badge.textContent = "← Swinging left";
+    } else {
+      badge.className   = "status live";
+      badge.textContent = "↓ Near equilibrium";
+    }
+
+  } else if (!hasData) {
+    badge.className   = "status waiting";
+    badge.textContent = "⏳ Waiting for detection";
+    keEl.textContent = peEl.textContent = teEl.textContent = "0.000";
+    angleEl.textContent = "—";
+    omegaEl.textContent = "—";
+  }
+
+  drawPendulum();
+  drawGraph();
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+</body>
+</html>
