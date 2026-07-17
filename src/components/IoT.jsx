@@ -1,42 +1,26 @@
-  import React from "react";
+import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 /* ========================================================
-   IoT LABS CONFIGURATION REGISTRY
-   To scale, simply place your standalone Three.js build folder
-   inside public/iot/ and register its metadata properties here.
+   IoT LABS CONFIGURATION REGISTRY — only pendulum remains
 ======================================================== */
 const IOT_LABS_LIST = [
   {
     id: "pendulamwithiot",
     title: "🛰️ IoT Pendulum Simulation",
-    description: "Real-time telemetry streams and oscillation damping physics visualization.",
+    description: "Real‑time telemetry streams and oscillation damping physics visualization.",
     icon: "🪐"
-  },
-  {
-    id: "smart-grid",
-    title: "⚡ Smart Micro-Grid Simulation",
-    description: "Monitor real-time system power distribution loads and battery optimization matrices.",
-    icon: "🔋"
-  },
-  {
-    id: "weather-station",
-    title: "🌦️ Environmental IoT Station",
-    description: "3D weather array tracking atmospheric pressure, humidity, and active lux nodes.",
-    icon: "📡"
   }
 ];
 
 export default function IoTLabHub() {
   const navigate = useNavigate();
-  const { labId } = useParams(); // Evaluates dynamic URL route segment
+  const { labId } = useParams();
 
-  // Matches url parameter to our configured static file directory targets
   const activeLab = IOT_LABS_LIST.find((lab) => lab.id === labId);
 
   /* --------------------------------------------------------
-     VIEWPORT MODALITY A: FULLSCREEN CANVAS RENDERER
-     Fires when matching /iot/:labId path configuration
+     FULLSCREEN VIEW (when /iot/:labId is matched)
   -------------------------------------------------------- */
   if (labId && activeLab) {
     return (
@@ -47,14 +31,14 @@ export default function IoTLabHub() {
           left: 0, 
           width: "100vw", 
           height: "100vh", 
-          zIndex: 99999, // Supercedes all background dashboard elements
+          zIndex: 99999,
           backgroundColor: "#000",
           display: "flex",
           flexDirection: "column",
-          overflow: "hidden" // Destroys vertical/horizontal scroll leakage
+          overflow: "hidden"
         }}
       >
-        {/* Isolated Floating HUD Controller Bar */}
+        {/* HUD bar */}
         <div 
           style={{ 
             background: "rgba(10, 16, 20, 0.95)", 
@@ -82,7 +66,7 @@ export default function IoTLabHub() {
           >
             ⬅ Return to IoT Hub
           </button>
-          <h2 className="console-title" style={{ fontSize: "1.4rem", margin: 0, color: "#fff", fontFamily: "'Courier New', monospace" }}>
+          <h2 style={{ fontSize: "1.4rem", margin: 0, color: "#fff", fontFamily: "'Courier New', monospace" }}>
             {activeLab.title.toUpperCase()}
           </h2>
           <span style={{ color: "#0ff", fontFamily: "monospace", textShadow: "0 0 8px #0ff", fontSize: "0.9rem" }}>
@@ -90,7 +74,7 @@ export default function IoTLabHub() {
           </span>
         </div>
 
-        {/* Core Sandboxed Native Viewport Element */}
+        {/* Sandboxed iframe */}
         <div style={{ flex: 1, width: "100%", height: "100%", overflow: "hidden", background: "#000" }}>
           <iframe
             src={`/iot/${activeLab.id}/index.html`}
@@ -112,13 +96,11 @@ export default function IoTLabHub() {
   }
 
   /* --------------------------------------------------------
-     VIEWPORT MODALITY B: INTERACTIVE HUB MATRIX SELECTION
-     Fires when accessing base /iot path configuration
+     HUB VIEW (only one lab card)
   -------------------------------------------------------- */
   return (
     <div className="console-bg" style={{ minHeight: "100vh", padding: "20px", boxSizing: "border-box" }}>
       <div className="console-panel">
-        {/* Grid Title Architecture Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
           <button 
             className="lab-button" 
@@ -130,20 +112,20 @@ export default function IoTLabHub() {
           <h1 className="console-title" style={{ margin: 0, textAlign: "center" }}>
             📡 INTERNET OF THINGS (IoT) 3D LABS
           </h1>
-          <div style={{ width: "140px" }} /> {/* Preserves flex balancing layout mapping */}
+          <div style={{ width: "140px" }} />
         </div>
 
         <p style={{ color: "#8ab", fontFamily: "monospace", textAlign: "center", marginBottom: "2rem" }}>
           Select an operational node interface below to route systemic graphics parameters directly onto your layout canvas.
         </p>
 
-        {/* Flex Dashboard Card Manifest Matrix */}
         <div 
           className="lab-grid" 
           style={{ 
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", 
-            gap: "20px" 
+            gap: "20px",
+            justifyContent: "center"
           }}
         >
           {IOT_LABS_LIST.map((lab) => (
@@ -160,7 +142,9 @@ export default function IoTLabHub() {
                 flexDirection: "column",
                 alignItems: "center",
                 textAlign: "center",
-                background: "rgba(5, 10, 15, 0.6)"
+                background: "rgba(5, 10, 15, 0.6)",
+                maxWidth: "400px",
+                margin: "0 auto"
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = "#0ff";
@@ -180,7 +164,6 @@ export default function IoTLabHub() {
               <p style={{ color: "#8aa", fontSize: "0.9rem", margin: "0 0 20px 0", lineHeight: "1.5", flexGrow: 1 }}>
                 {lab.description}
               </p>
-              
               <button 
                 className="lab-button" 
                 style={{ 
