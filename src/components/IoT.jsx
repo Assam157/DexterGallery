@@ -1,9 +1,14 @@
-import React from "react";
+ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-/* ========================================================
-   IoT LABS CONFIGURATION REGISTRY — only pendulum remains
-======================================================== */
+/* ============================================================
+   CONFIG – change this if your folder name differs
+============================================================ */
+const STATIC_BASE_PATH = "/public(iot)"; // matches your folder name
+
+/* ============================================================
+   IoT LABS REGISTRY – only pendulum remains
+============================================================ */
 const IOT_LABS_LIST = [
   {
     id: "pendulamwithiot",
@@ -19,10 +24,11 @@ export default function IoTLabHub() {
 
   const activeLab = IOT_LABS_LIST.find((lab) => lab.id === labId);
 
-  /* --------------------------------------------------------
-     FULLSCREEN VIEW (when /iot/:labId is matched)
-  -------------------------------------------------------- */
+  // --- FULLSCREEN VIEW (when /iot/:labId is matched) ---
   if (labId && activeLab) {
+    // Build the correct URL: /public(iot)/pendulamwithiot/index.html
+    const iframeSrc = `${STATIC_BASE_PATH}/${activeLab.id}/index.html`;
+
     return (
       <div 
         style={{ 
@@ -52,7 +58,6 @@ export default function IoTLabHub() {
           }}
         >
           <button 
-            className="lab-button" 
             onClick={() => navigate("/iot")} 
             style={{ 
               width: "auto", 
@@ -61,7 +66,8 @@ export default function IoTLabHub() {
               cursor: "pointer",
               border: "1px solid #0ff",
               background: "transparent",
-              color: "#0ff"
+              color: "#0ff",
+              fontSize: "0.9rem"
             }}
           >
             ⬅ Return to IoT Hub
@@ -74,10 +80,10 @@ export default function IoTLabHub() {
           </span>
         </div>
 
-        {/* Sandboxed iframe */}
+        {/* Iframe – source now points to /public(iot)/... */}
         <div style={{ flex: 1, width: "100%", height: "100%", overflow: "hidden", background: "#000" }}>
           <iframe
-            src={`/iot/${activeLab.id}/index.html`}
+            src={iframeSrc}
             title={activeLab.title}
             style={{ 
               width: "100%", 
@@ -95,9 +101,7 @@ export default function IoTLabHub() {
     );
   }
 
-  /* --------------------------------------------------------
-     HUB VIEW (only one lab card)
-  -------------------------------------------------------- */
+  // --- HUB VIEW (single card) ---
   return (
     <div className="console-bg" style={{ minHeight: "100vh", padding: "20px", boxSizing: "border-box" }}>
       <div className="console-panel">
