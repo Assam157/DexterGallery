@@ -23,6 +23,7 @@ import DiodeBiasLab from "./components/PN-JunctionDiodeShwoing";
 import PNJunctionDiffusion from "./components/PNJunctionDIode";
 import CSLab from "./components/CSLab";
 import RoboticsLab from "./components/RoboticsAutomationLab";
+import IoTLab from "./components/IoT";
 import "./App.css";
 
 /* ==============================
@@ -82,6 +83,7 @@ function DexterHome() {
         case "0": navigate("/mathemetics"); break;
         case "-": navigate("/cs"); break;
         case "=": navigate("/robotics"); break;
+        case "p": navigate("/iot"); break; // Key binding for IoT Lab
         default: break;
       }
     };
@@ -114,7 +116,7 @@ function DexterHome() {
       <div className="console-panel">
         <h1 className="console-title">⚛️ Dexters Lab</h1>
 
-        {/* Global Keyframe CSS Styles - kept only what's necessary */}
+        {/* Global Keyframe CSS Styles injected directly for custom premium components */}
         <style>{`
           .discover-3d-heading {
             text-align: center;
@@ -131,9 +133,70 @@ function DexterHome() {
           .discover-3d-heading:hover {
             transform: scale(1.03);
           }
+          
+          /* HIGHLY STYLIZED FEATURED IOT CALLOUT BUTTON */
+          .iot-premium-showcase-btn {
+            width: 100%;
+            background: linear-gradient(90deg, rgba(0,230,255,0.15) 0%, rgba(0,0,0,0.6) 50%, rgba(0,230,255,0.15) 100%);
+            border: 2px solid #0ff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2), inset 0 0 15px rgba(0, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 22px;
+            margin: 1.5rem 0;
+            cursor: pointer;
+            display: flex;
+            justifyContent: space-between;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+          }
+          .iot-premium-showcase-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.25), transparent);
+            transform: skewX(-25deg);
+            animation: laserSweep 3.5s infinite;
+          }
+          .iot-premium-showcase-btn:hover {
+            transform: translateY(-2px);
+            border-color: #fff;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.5), inset 0 0 20px rgba(0, 255, 255, 0.2);
+          }
+          .iot-btn-title {
+            font-family: 'Courier New', monospace;
+            font-size: 1.6rem;
+            color: #fff;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px #0ff;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+          }
+          .iot-btn-tag {
+            background: #0ff;
+            color: #000;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 3px;
+            letter-spacing: 1px;
+            box-shadow: 0 0 8px #0ff;
+          }
+
           @keyframes glowPulse {
             from { text-shadow: 0 0 20px #0ff, 0 0 40px #0ff, 0 0 60px #0ff; }
             to   { text-shadow: 0 0 30px #0ff, 0 0 70px #0ff, 0 0 100px #0ff; }
+          }
+          @keyframes laserSweep {
+            0% { left: -100%; }
+            30% { left: 150%; }
+            100% { left: 150%; }
           }
         `}</style>
 
@@ -151,7 +214,16 @@ function DexterHome() {
           </button>
         )}
 
-        {/* The extra IoT promotional block has been removed per request */}
+        {/* FEATURED BREAKOUT HERO BUTTON: FORCES IOT TO STAND OUT AS A REMARKABLE CORE ASSET */}
+        <div className="iot-premium-showcase-btn" onClick={() => navigate("/iot")}>
+          <div className="iot-btn-title">
+            <span>📡</span> 
+            <span>REAL-TIME 3D IoT Labs</span>
+          </div>
+          <div style={{ color: "#0ff", fontFamily: "monospace", fontSize: "0.9rem", textShadow: "0 0 5px #0ff" }}>
+            INITIALIZE NODE SYSTEMS MODULE [P] ➔
+          </div>
+        </div>
 
         {/* Standard Matrix Application Grid */}
         <div className="lab-grid">
@@ -226,7 +298,9 @@ export default function App() {
         <Route path="/cs" element={<CSLab />} />
         <Route path="/robotics" element={<RoboticsLab />} />
         
-     
+        {/* Parametric Route Handlers for the nested configurations */}
+        <Route path="/iot" element={<IoTLab />} />
+        <Route path="/iot/:labId" element={<IoTLab />} />
       </Routes>
     </Router>
   );
