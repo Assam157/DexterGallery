@@ -1,0 +1,732 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Micro-Grid - 3D Town</title>
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Courier New', monospace; background-color: #050a0f; }
+    
+    #hud {
+      position: absolute;
+      bottom: 30px;
+      left: 30px;
+      background: rgba(5, 10, 15, 0.85);
+      border: 1px solid #0ff;
+      box-shadow: 0 0 35px rgba(0, 255, 255, 0.15);
+      padding: 20px 28px;
+      border-radius: 8px;
+      color: #8ab;
+      min-width: 240px;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+      z-index: 10;
+      border-left: 4px solid #0ff;
+    }
+    #hud .title {
+      color: #0ff;
+      font-size: 0.8rem;
+      letter-spacing: 3px;
+      text-shadow: 0 0 10px #0ff;
+      margin-bottom: 12px;
+      border-bottom: 1px dashed #1a3a4a;
+      padding-bottom: 8px;
+    }
+    #hud .row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      padding: 5px 0;
+    }
+    #hud .value { color: #fff; font-weight: bold; }
+    .highlight-green { color: #0f0; text-shadow: 0 0 5px #0f0; }
+    .highlight-cyan { color: #0ff; text-shadow: 0 0 5px #0ff; }
+    .highlight-orange { color: #fa0; text-shadow: 0 0 5px #fa0; }
+
+    #controls {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      background: rgba(5, 10, 15, 0.85);
+      border: 1px solid #355;
+      padding: 18px 22px;
+      border-radius: 8px;
+      color: #8ab;
+      backdrop-filter: blur(4px);
+      z-index: 10;
+      pointer-events: auto;
+      min-width: 180px;
+    }
+    #controls label {
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      color: #5a7a8a;
+    }
+    #controls input[type="range"] {
+      width: 100%;
+      margin: 6px 0 0 0;
+      background: #1a2a30;
+      height: 4px;
+      border-radius: 2px;
+      -webkit-appearance: none;
+      appearance: none;
+      outline: none;
+    }
+    #controls input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #0ff;
+      cursor: pointer;
+      box-shadow: 0 0 15px #0ff;
+    }
+    #controls .hint {
+      font-size: 0.6rem;
+      color: #4a6a7a;
+      margin-top: 10px;
+      border-top: 1px solid #1a2a30;
+      padding-top: 8px;
+      line-height: 1.4;
+    }
+    #controls .hint span { color: #0ff; }
+
+    #click-prompt {
+      position: absolute;
+      top: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #5a8a9a;
+      font-size: 0.8rem;
+      background: rgba(0,0,0,0.6);
+      padding: 6px 24px;
+      border-radius: 30px;
+      border: 1px solid #1a3a4a;
+      z-index: 10;
+      pointer-events: none;
+      letter-spacing: 2px;
+      backdrop-filter: blur(2px);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="hud">
+    <div class="title">⚡ MICRO-GRID STATUS</div>
+    <div class="row"><span>Total Load</span><span class="value highlight-orange" id="load-display">0.0 MW</span></div>
+    <div class="row"><span>Solar Output</span><span class="value highlight-green" id="solar-display">0.0 MW</span></div>
+    <div class="row"><span>Battery SoC</span><span class="value highlight-cyan" id="battery-display">0%</span></div>
+    <div class="row"><span>Grid Freq</span><span class="value" id="freq-display" style="color:#fff;">0.00 Hz</span></div>
+  </div>
+
+  <div id="controls">
+    <label for="wind-slider">🌬️ WIND SPEED</label>
+    <input type="range" id="wind-slider" min="0" max="2.5" step="0.01" value="1.2">
+    <div class="hint">🖱️ Click <span>Houses</span> (toggle load)<br>Click <span>Substation</span> (toggle charge)</div>
+  </div>
+
+  <div id="click-prompt">🏙️ INTERACTIVE 3D GRID TOWN</div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // --- 1. SCENE SETUP (Expanded) ---
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x050a0f);
+    scene.fog = new THREE.Fog(0x050a0f, 40, 90);
+
+    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 120);
+    // PROPER VIEW: Cinematic elevated angle covering the whole town
+    camera.position.set(38, 28, 42);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
+    document.body.prepend(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.target.set(0, 1, 0);
+    controls.maxPolarAngle = Math.PI / 2.2;
+    controls.minDistance = 8;
+    controls.maxDistance = 80;
+    controls.update();
+
+    // --- 2. LIGHTS (Expanded Shadows) ---
+    const ambient = new THREE.AmbientLight(0x224466, 0.5);
+    scene.add(ambient);
+
+    const sunLight = new THREE.DirectionalLight(0xffeedd, 2.0);
+    sunLight.position.set(15, 25, 10);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    const d = 55;
+    sunLight.shadow.camera.left = -d;
+    sunLight.shadow.camera.right = d;
+    sunLight.shadow.camera.top = d;
+    sunLight.shadow.camera.bottom = -d;
+    sunLight.shadow.camera.near = 1;
+    sunLight.shadow.camera.far = 60;
+    scene.add(sunLight);
+
+    const fillLight = new THREE.DirectionalLight(0x4488ff, 0.3);
+    fillLight.position.set(-20, 10, -20);
+    scene.add(fillLight);
+
+    const hemi = new THREE.HemisphereLight(0x4466aa, 0x221100, 0.6);
+    scene.add(hemi);
+
+    // --- 3. GROUND (Massive) ---
+    const groundGeo = new THREE.CircleGeometry(55, 48);
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x0a141c, roughness: 0.9, metalness: 0.1 });
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -0.05;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    const gridHelper = new THREE.GridHelper(70, 30, 0x0ff, 0x1a3a4a);
+    gridHelper.position.y = 0.01;
+    scene.add(gridHelper);
+
+    // --- 4. UTILITY FUNCTIONS (Expanded Asset Library) ---
+
+    // House with multiple variants
+    function createHouse(posX, posZ, colorVariant = 0) {
+      const group = new THREE.Group();
+      const colors = [0x4a7a8a, 0x6a5a7a, 0x3a6a5a, 0x7a5a4a, 0x5a7a6a, 0x8a6a5a, 0x4a6a8a, 0x6a8a5a];
+      const roofColors = [0x4a2a2a, 0x3a2a3a, 0x2a3a2a, 0x5a3a2a, 0x3a4a3a, 0x6a4a3a];
+      const mainColor = colors[colorVariant % colors.length];
+      const roofColor = roofColors[colorVariant % roofColors.length];
+      
+      // Base
+      const baseMat = new THREE.MeshStandardMaterial({ color: mainColor, roughness: 0.7, metalness: 0.1 });
+      const base = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.9, 1.4), baseMat);
+      base.position.y = 0.45;
+      base.castShadow = true;
+      base.receiveShadow = true;
+      group.add(base);
+
+      // Roof (Pyramid or Gable)
+      const roofMat = new THREE.MeshStandardMaterial({ color: roofColor, roughness: 0.8 });
+      let roof;
+      if (Math.random() > 0.5) {
+        roof = new THREE.Mesh(new THREE.ConeGeometry(1.5, 0.9, 4), roofMat);
+        roof.rotation.y = Math.PI / 4;
+      } else {
+        // Gable roof
+        const shape = new THREE.Shape();
+        shape.moveTo(-1.0, 0);
+        shape.lineTo(0, 0.8);
+        shape.lineTo(1.0, 0);
+        shape.lineTo(-1.0, 0);
+        const extrudeSettings = { depth: 1.6, bevelEnabled: false };
+        const roofGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        roof = new THREE.Mesh(roofGeo, roofMat);
+        roof.position.set(0, 0.9, -0.8);
+      }
+      roof.position.y = 0.45;
+      roof.castShadow = true;
+      roof.receiveShadow = true;
+      group.add(roof);
+
+      // Windows (interactive glow)
+      const winMatOn = new THREE.MeshStandardMaterial({ color: 0xffaa44, emissive: 0xff8800, emissiveIntensity: 0.8 });
+      const winMatOff = new THREE.MeshStandardMaterial({ color: 0x223344, emissive: 0x000000 });
+      const winGeo = new THREE.PlaneGeometry(0.2, 0.3);
+      
+      const windowMeshes = [];
+      const winPos = [[-0.6, 0.5, 0.71], [0.6, 0.5, 0.71], [-0.6, 0.15, 0.71], [0.6, 0.15, 0.71]];
+      winPos.forEach(p => {
+        const mat = winMatOn; // default on
+        const mesh = new THREE.Mesh(winGeo, mat);
+        mesh.position.set(p[0], p[1], p[2]);
+        windowMeshes.push(mesh);
+        group.add(mesh);
+      });
+
+      group.position.set(posX, 0, posZ);
+      // Random initial load state
+      const initialLoad = Math.random() > 0.3;
+      group.userData = { 
+        isHouse: true, 
+        loadActive: initialLoad, 
+        windows: windowMeshes,
+        winMatOn, winMatOff
+      };
+      return group;
+    }
+
+    // Tree
+    function createTree(posX, posZ) {
+      const group = new THREE.Group();
+      const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4a3a2a, roughness: 0.9 });
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 0.8), trunkMat);
+      trunk.position.y = 0.4;
+      trunk.castShadow = true;
+      group.add(trunk);
+
+      const leafMat = new THREE.MeshStandardMaterial({ color: 0x2a5a3a, roughness: 0.8 });
+      const crown = new THREE.Mesh(new THREE.SphereGeometry(0.5 + Math.random()*0.3, 5), leafMat);
+      crown.position.y = 0.9 + Math.random()*0.2;
+      crown.castShadow = true;
+      group.add(crown);
+      
+      group.position.set(posX, 0, posZ);
+      return group;
+    }
+
+    // Street Lamp
+    function createLamp(posX, posZ) {
+      const group = new THREE.Group();
+      const poleMat = new THREE.MeshStandardMaterial({ color: 0x5a6a7a, metalness: 0.6, roughness: 0.3 });
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 1.6), poleMat);
+      pole.position.y = 0.8;
+      group.add(pole);
+      
+      const arm = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.04, 0.04), poleMat);
+      arm.position.set(0.2, 1.6, 0);
+      group.add(arm);
+
+      const lightMat = new THREE.MeshStandardMaterial({ color: 0xffdd44, emissive: 0xffaa00, emissiveIntensity: 0.3 });
+      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6), lightMat);
+      bulb.position.set(0.4, 1.55, 0);
+      group.add(bulb);
+
+      group.position.set(posX, 0, posZ);
+      return group;
+    }
+
+    // Wind Turbine (Bigger)
+    function createTurbine(posX, posZ, scale = 1.0) {
+      const group = new THREE.Group();
+      const towerMat = new THREE.MeshStandardMaterial({ color: 0x8aaabc, metalness: 0.5, roughness: 0.4 });
+      const tower = new THREE.Mesh(new THREE.CylinderGeometry(0.15 * scale, 0.25 * scale, 3.5 * scale), towerMat);
+      tower.position.y = 1.75 * scale;
+      tower.castShadow = true;
+      group.add(tower);
+
+      const nacelle = new THREE.Mesh(new THREE.BoxGeometry(0.5 * scale, 0.35 * scale, 0.5 * scale), 
+        new THREE.MeshStandardMaterial({ color: 0xccddee }));
+      nacelle.position.set(0, 3.6 * scale, 0);
+      group.add(nacelle);
+
+      const bladeGroup = new THREE.Group();
+      bladeGroup.position.set(0, 3.7 * scale, 0);
+      const bladeMat = new THREE.MeshStandardMaterial({ color: 0xeeeeff, roughness: 0.3, metalness: 0.1 });
+      const bladeGeo = new THREE.BoxGeometry(0.06 * scale, 0.8 * scale, 0.1 * scale);
+      for (let i = 0; i < 3; i++) {
+        const blade = new THREE.Mesh(bladeGeo, bladeMat);
+        blade.position.y = 0.4 * scale;
+        blade.rotation.z = (i / 3) * Math.PI * 2;
+        bladeGroup.add(blade);
+      }
+      group.add(bladeGroup);
+
+      group.position.set(posX, 0, posZ);
+      group.userData = { bladeGroup, speed: 1.0 };
+      return group;
+    }
+
+    // Solar Array (Bigger)
+    function createSolarArray(posX, posZ, rows = 4, cols = 6) {
+      const group = new THREE.Group();
+      const panelMat = new THREE.MeshStandardMaterial({ color: 0x112244, emissive: 0x224488, emissiveIntensity: 0.1, metalness: 0.2 });
+      const frameMat = new THREE.MeshStandardMaterial({ color: 0x5a6a7a });
+
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          const panel = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.04, 0.35), panelMat);
+          panel.position.set(j * 0.6 - (cols-1)*0.3, 0.2, i * 0.45 - (rows-1)*0.225);
+          panel.rotation.x = -0.25;
+          panel.castShadow = true;
+          group.add(panel);
+        }
+      }
+      const frame = new THREE.Mesh(new THREE.BoxGeometry(cols * 0.6 + 0.3, 0.08, rows * 0.45 + 0.3), frameMat);
+      frame.position.y = 0.08;
+      group.add(frame);
+
+      group.position.set(posX, 0, posZ);
+      return group;
+    }
+
+    // --- 5. BUILD THE TOWN (Expanded Layout) ---
+
+    // 5a. Roads
+    function createRoad(x, z, width, length, angle = 0) {
+      const mat = new THREE.MeshStandardMaterial({ color: 0x1a2a30, roughness: 0.9 });
+      const road = new THREE.Mesh(new THREE.BoxGeometry(width, 0.05, length), mat);
+      road.position.set(x, 0.02, z);
+      road.rotation.y = angle;
+      road.receiveShadow = true;
+      scene.add(road);
+    }
+
+    // Main grid roads (4x4 blocks)
+    for (let i = -2; i <= 2; i++) {
+      for (let j = -2; j <= 2; j++) {
+        if (Math.abs(i) <= 1 && Math.abs(j) <= 1) continue; // skip inner blocks for roads
+        // Horizontal roads
+        if (Math.abs(i) <= 1) {
+          createRoad(i * 12, j * 12, 8, 2.5);
+        }
+        // Vertical roads
+        if (Math.abs(j) <= 1) {
+          createRoad(i * 12, j * 12, 2.5, 8);
+        }
+      }
+    }
+    // Outer ring roads
+    createRoad(0, -30, 55, 2);
+    createRoad(0, 30, 55, 2);
+    createRoad(-30, 0, 2, 55);
+    createRoad(30, 0, 2, 55);
+
+    // 5b. Houses (32 houses arranged in blocks)
+    const housePositions = [];
+    const blockPositions = [
+      [-12, -12], [12, -12], [-12, 12], [12, 12], 
+      [-24, -12], [24, -12], [-24, 12], [24, 12],
+      [-12, -24], [12, -24], [-12, 24], [12, 24]
+    ];
+    const houses = [];
+    blockPositions.forEach((bp, idx) => {
+      const [bx, bz] = bp;
+      // 4 houses per block
+      const offsets = [[-2.5, -2.5], [2.5, -2.5], [-2.5, 2.5], [2.5, 2.5]];
+      offsets.forEach((off, i) => {
+        const posX = bx + off[0];
+        const posZ = bz + off[1];
+        const house = createHouse(posX, posZ, idx * 4 + i);
+        scene.add(house);
+        houses.push(house);
+        housePositions.push({ x: posX, z: posZ });
+      });
+    });
+
+    // 5c. Trees (Scattered along streets)
+    for (let i = 0; i < 60; i++) {
+      let x, z, valid;
+      let attempts = 0;
+      do {
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 5 + Math.random() * 28;
+        x = Math.cos(angle) * radius;
+        z = Math.sin(angle) * radius;
+        valid = true;
+        // Avoid roads and houses
+        if (Math.abs(x) < 32 && Math.abs(z) < 32) {
+          if (Math.abs(x % 12) < 4 || Math.abs(z % 12) < 4) valid = false;
+        }
+        housePositions.forEach(hp => {
+          if (Math.hypot(x - hp.x, z - hp.z) < 1.8) valid = false;
+        });
+        attempts++;
+      } while (!valid && attempts < 30);
+      if (valid) {
+        scene.add(createTree(x, z));
+      }
+    }
+
+    // 5d. Street Lamps
+    const lampPositions = [
+      [-18, -18], [18, -18], [-18, 18], [18, 18],
+      [-6, -18], [6, -18], [-6, 18], [6, 18],
+      [-18, -6], [18, -6], [-18, 6], [18, 6]
+    ];
+    lampPositions.forEach(pos => {
+      scene.add(createLamp(pos[0], pos[1]));
+    });
+
+    // 5e. Wind Farm (8 turbines on the left)
+    for (let i = 0; i < 8; i++) {
+      const x = -28 + Math.random() * 4;
+      const z = -15 + i * 4.5 + Math.random() * 1.5;
+      const turb = createTurbine(x, z, 1.2 + Math.random() * 0.3);
+      scene.add(turb);
+    }
+
+    // 5f. Solar Farms (Right side)
+    scene.add(createSolarArray(26, -10, 5, 8));
+    scene.add(createSolarArray(26, 10, 5, 8));
+
+    // 5g. Central Battery Substation (Massive)
+    function createSubstation() {
+      const group = new THREE.Group();
+      
+      // Concrete base
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(6, 7, 0.5, 32), 
+        new THREE.MeshStandardMaterial({ color: 0x2a3a4a, roughness: 0.9 }));
+      base.position.y = 0.25;
+      base.receiveShadow = true;
+      group.add(base);
+
+      // Battery containers (6 units)
+      const containerMat = new THREE.MeshStandardMaterial({ color: 0x3a4a5a, metalness: 0.5, roughness: 0.4 });
+      const containerMatActive = new THREE.MeshStandardMaterial({ color: 0x00ff88, emissive: 0x00ff88, emissiveIntensity: 0.2 });
+      
+      const batteryContainers = [];
+      for (let i = 0; i < 6; i++) {
+        const angle = (i / 6) * Math.PI * 2;
+        const r = 2.8;
+        const x = Math.cos(angle) * r;
+        const z = Math.sin(angle) * r;
+        const container = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.2, 1.6), containerMat);
+        container.position.set(x, 0.8, z);
+        container.castShadow = true;
+        group.add(container);
+        batteryContainers.push(container);
+      }
+
+      // Central pillar with glowing orb
+      const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.8, 2.0), 
+        new THREE.MeshStandardMaterial({ color: 0x1a2a30, metalness: 0.7 }));
+      pillar.position.y = 1.2;
+      group.add(pillar);
+
+      const orbMat = new THREE.MeshStandardMaterial({ color: 0x0ff, emissive: 0x0ff, emissiveIntensity: 0.8 });
+      const orb = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 16), orbMat);
+      orb.position.y = 2.2;
+      group.add(orb);
+
+      // Fence
+      const fenceMat = new THREE.MeshStandardMaterial({ color: 0x4a5a6a, metalness: 0.3 });
+      for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * Math.PI * 2;
+        const r = 4.8;
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.8), fenceMat);
+        post.position.set(Math.cos(angle) * r, 0.4, Math.sin(angle) * r);
+        group.add(post);
+      }
+
+      group.position.set(0, 0, 0);
+      group.userData = { 
+        isBattery: true, 
+        charging: true,
+        containers: batteryContainers,
+        containerMat, containerMatActive,
+        orb, orbMat,
+        chargeLevel: 0.75
+      };
+      return group;
+    }
+
+    const substation = createSubstation();
+    scene.add(substation);
+
+    // 5h. Power lines from farms to substation (Animated particles)
+    const particleSystems = [];
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x1a5a6a, transparent: true, opacity: 0.2 });
+
+    function createPowerLine(start, end, color = 0x0ff) {
+      const mid = new THREE.Vector3(
+        (start.x + end.x) / 2,
+        Math.max(start.y, end.y) + 3.5 + Math.random() * 0.5,
+        (start.z + end.z) / 2
+      );
+      const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+      
+      const points = curve.getPoints(25);
+      const geo = new THREE.BufferGeometry().setFromPoints(points);
+      const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.15 }));
+      scene.add(line);
+      
+      const particle = new THREE.Mesh(new THREE.SphereGeometry(0.1, 4, 4), 
+        new THREE.MeshBasicMaterial({ color: 0x00ffcc }));
+      particle.userData = { curve, t: Math.random(), speed: 0.001 + Math.random() * 0.002 };
+      scene.add(particle);
+      particleSystems.push(particle);
+    }
+
+    // Connect wind farm and solar farm
+    const subPos = new THREE.Vector3(0, 0.8, 0);
+    for (let i = -2; i <= 2; i+=2) {
+      for (let j = -2; j <= 2; j+=2) {
+        if (i === 0 && j === 0) continue;
+        const start = new THREE.Vector3(i * 18, 0.3, j * 18);
+        createPowerLine(start, subPos, 0x44ff88);
+      }
+    }
+
+    // --- 6. STATE MANAGEMENT ---
+
+    const state = {
+      load: 2.5,
+      solar: 2.0,
+      batterySoc: 75,
+      frequency: 50.0,
+      windSpeed: 1.2,
+    };
+
+    const loadDisplay = document.getElementById('load-display');
+    const solarDisplay = document.getElementById('solar-display');
+    const batteryDisplay = document.getElementById('battery-display');
+    const freqDisplay = document.getElementById('freq-display');
+    const windSlider = document.getElementById('wind-slider');
+
+    function updateHUD() {
+      loadDisplay.textContent = state.load.toFixed(1) + ' MW';
+      solarDisplay.textContent = state.solar.toFixed(1) + ' MW';
+      batteryDisplay.textContent = Math.round(state.batterySoc) + '%';
+      freqDisplay.textContent = state.frequency.toFixed(2) + ' Hz';
+      
+      if (state.frequency < 49.7 || state.frequency > 50.3) {
+        freqDisplay.style.color = '#ff6644';
+        freqDisplay.style.textShadow = '0 0 15px #ff4400';
+      } else {
+        freqDisplay.style.color = '#fff';
+        freqDisplay.style.textShadow = 'none';
+      }
+    }
+
+    function updateGridState() {
+      let activeLoads = 0;
+      houses.forEach(h => { if (h.userData.loadActive) activeLoads++; });
+      state.load = 0.8 + (activeLoads * 0.25);
+      state.solar = 1.8 + Math.sin(Date.now() * 0.0002) * 0.5 + Math.sin(Date.now() * 0.0005) * 0.2;
+      
+      const battData = substation.userData;
+      if (battData.charging) {
+        state.batterySoc = Math.min(100, state.batterySoc + 0.015);
+      } else {
+        state.batterySoc = Math.max(5, state.batterySoc - 0.025);
+      }
+      battData.chargeLevel = state.batterySoc / 100;
+      
+      state.frequency = 50.0 - (state.load - 2.0) * 0.1 + (Math.random() - 0.5) * 0.02;
+      updateHUD();
+    }
+
+    updateGridState();
+
+    windSlider.addEventListener('input', (e) => {
+      state.windSpeed = parseFloat(e.target.value);
+    });
+
+    // --- 7. INTERACTIVITY (Raycaster) ---
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const clickables = [substation, ...houses];
+
+    renderer.domElement.addEventListener('click', (event) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(pointer, camera);
+      
+      const meshes = [];
+      clickables.forEach(group => {
+        group.children.forEach(child => {
+          if (child.isMesh) {
+            child.userData.parentGroup = group;
+            meshes.push(child);
+          }
+        });
+      });
+
+      const intersects = raycaster.intersectObjects(meshes);
+      if (intersects.length > 0) {
+        const hitMesh = intersects[0].object;
+        const parentGroup = hitMesh.userData.parentGroup;
+        if (!parentGroup) return;
+
+        // Substation
+        if (parentGroup.userData.isBattery) {
+          const data = parentGroup.userData;
+          data.charging = !data.charging;
+          const color = data.charging ? 0x00ff88 : 0xff6644;
+          const emColor = data.charging ? 0x00ff88 : 0xff4400;
+          data.orb.material.color.setHex(color);
+          data.orb.material.emissive.setHex(emColor);
+          data.containers.forEach(c => {
+            c.material = data.charging ? data.containerMatActive : data.containerMat;
+          });
+          return;
+        }
+
+        // Houses
+        if (parentGroup.userData.isHouse) {
+          const data = parentGroup.userData;
+          data.loadActive = !data.loadActive;
+          data.windows.forEach(win => {
+            win.material = data.loadActive ? data.winMatOn : data.winMatOff;
+          });
+          updateGridState();
+        }
+      }
+    });
+
+    // --- 8. ANIMATION LOOP ---
+
+    let time = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      time += 0.01;
+
+      // Turbines
+      const turbSpeed = state.windSpeed * 0.6;
+      scene.children.forEach(child => {
+        if (child.userData && child.userData.bladeGroup) {
+          child.userData.bladeGroup.rotation.x += 0.025 * turbSpeed * 2;
+        }
+      });
+
+      // Substation orb pulse
+      const battData = substation.userData;
+      if (battData) {
+        const pulse = 0.7 + Math.sin(time * 2.5) * 0.3;
+        battData.orb.material.emissiveIntensity = 0.5 + pulse * 0.5;
+        battData.orb.scale.setScalar(1 + Math.sin(time * 2) * 0.05);
+      }
+
+      // Particles
+      particleSystems.forEach(p => {
+        const data = p.userData;
+        data.t += data.speed * state.windSpeed * 0.6;
+        if (data.t > 1) data.t = 0;
+        const point = data.curve.getPoint(data.t);
+        p.position.copy(point);
+      });
+
+      // Update state periodically
+      if (Math.floor(time * 5) % 3 === 0) {
+        updateGridState();
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // --- 9. RESIZE ---
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
