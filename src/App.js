@@ -1,4 +1,4 @@
- import React, { useEffect, useRef } from "react";
+  import React, { useEffect, useRef } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -24,6 +24,7 @@ import PNJunctionDiffusion from "./components/PNJunctionDIode";
 import CSLab from "./components/CSLab";
 import RoboticsLab from "./components/RoboticsAutomationLab";
 import IoTLab from "./components/IoT";
+import AntennaLab from "./components/AntennaLab";
 import "./App.css";
 
 /* ==============================
@@ -84,6 +85,8 @@ function DexterHome() {
         case "-": navigate("/cs"); break;
         case "=": navigate("/robotics"); break;
         case "p": navigate("/iot"); break; // Key binding for IoT Lab
+        case "a":
+        case "A": navigate("/antenna"); break; // Key binding for Antenna Lab
         default: break;
       }
     };
@@ -266,6 +269,9 @@ function DexterHome() {
           <button className="lab-button" onClick={() => navigate("/robotics")}>
             🤖 Robotics & Automation Lab
           </button>
+          <button className="lab-button" onClick={() => navigate("/antenna")}>
+            📡 Antenna & RF Lab
+          </button>
         </div>
       </div>
     </div>
@@ -297,6 +303,7 @@ export default function App() {
         <Route path="/tides" element={<TidesMoonLab />} />
         <Route path="/cs" element={<CSLab />} />
         <Route path="/robotics" element={<RoboticsLab />} />
+        <Route path="/antenna" element={<AntennaLab />} />
         
         {/* Parametric Route Handlers for the nested configurations */}
         <Route path="/iot" element={<IoTLab />} />
