@@ -271,3 +271,117 @@
   .antenna-stage { padding: 14px; }
   .antenna-controls { border-left: 0; }
 }
+/* Wrap keeps the toggle positioned over the canvas */
+.antenna-canvas-wrap {
+  position: relative;
+  width: 760px;
+  height: 500px;
+  max-width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(86, 231, 255, 0.12);
+}
+
+.antenna-3d-mount {
+  width: 760px;
+  height: 500px;
+  max-width: 100%;
+  background: #08111f;
+}
+
+.antenna-3d-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #82aebf;
+  font: 12px monospace;
+  letter-spacing: 0.1em;
+}
+
+/* 2D | 3D pill */
+.antenna-mode-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: inline-flex;
+  background: rgba(8, 17, 31, 0.85);
+  border: 1px solid rgba(86, 231, 255, 0.28);
+  border-radius: 999px;
+  padding: 2px;
+  backdrop-filter: blur(6px);
+}
+
+.antenna-mode-toggle button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #82aebf;
+  font: 600 11px/1 "monospace";
+  letter-spacing: 0.08em;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.antenna-mode-toggle button:hover {
+  color: #d9f5ff;
+}
+
+.antenna-mode-toggle button.active {
+  background: #21e6ff;
+  color: #06121e;
+}
+/* Radiation-pattern toolbar */
+.rad-pattern-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  background: rgba(8, 17, 31, 0.6);
+  border: 1px solid rgba(86, 231, 255, 0.15);
+  border-radius: 8px;
+  color: #cbd5e1;
+  font-size: 12px;
+}
+
+.rad-toolbar-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rad-toolbar-label select {
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 1px solid #29384e;
+  border-radius: 5px;
+  background: #101a2b;
+  color: #e2e8f0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.rad-toolbar-label select:hover,
+.rad-toolbar-label select:focus {
+  border-color: #38bdf8;
+  outline: none;
+}
+
+.rad-toolbar-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.rad-toolbar-checkbox input {
+  accent-color: #38bdf8;
+  cursor: pointer;
+}

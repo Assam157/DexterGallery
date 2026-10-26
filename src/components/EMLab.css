@@ -113,3 +113,99 @@ body {
 .lab-bottom-panel input[type="range"] {
   width: 220px;
 }
+/* ── Canvas wrapper ───────────────────────────────────────────── */
+.lab-canvas-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  aspect-ratio: 1600 / 920;      /* ← guarantees the wrapper has height */
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;              /* clips the rounded corners, not the canvas */
+}
+
+/* ── The canvas itself ────────────────────────────────────────── */
+.lab-canvas-wrap > canvas {
+  display: block;
+  width: 100%;                   /* fills the wrapper horizontally */
+  height: 100%;                  /* fills the wrapper vertically */
+  /* internal resolution is set from JS (DPR-aware), CSS just scales */
+  background: #000;
+}
+
+/* ── The floating control panel ───────────────────────────────── */
+.cinema-energy {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 2;
+  width: min(280px, calc(100% - 40px));
+  padding: 14px 16px;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(0, 234, 255, 0.25);
+  border-radius: 10px;
+  color: #cbd5e1;
+  font: 12px/1.5 "Inter", system-ui, sans-serif;
+  backdrop-filter: blur(8px);
+}
+
+.cinema-energy .label {
+  color: #00eaff;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  margin-bottom: 2px;
+}
+
+.cinema-energy .value {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cinema-energy input[type="range"] {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  accent-color: #00eaff;
+  cursor: pointer;
+}
+
+.cinema-btn {
+  display: block;
+  width: 100%;
+  min-height: 34px;
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 234, 255, 0.35);
+  border-radius: 6px;
+  background: rgba(0, 234, 255, 0.08);
+  color: #00eaff;
+  font: 600 12px "Inter", system-ui, sans-serif;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cinema-btn:hover {
+  background: rgba(0, 234, 255, 0.18);
+}
+
+.panel-hint {
+  margin-top: 10px;
+  color: #64748b;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* Small screens: shrink the floating panel */
+@media (max-width: 700px) {
+  .cinema-energy {
+    bottom: 10px;
+    left: 10px;
+    padding: 10px 12px;
+    width: min(240px, calc(100% - 20px));
+  }
+  .cinema-energy .value { font-size: 18px; }
+}

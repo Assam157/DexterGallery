@@ -152,12 +152,12 @@ export default function WireExperiment() {
       <canvas ref={canvasRef} width={W} height={H} />
 
       {/* CONTROL PANEL */}
-      <div className="cinema-energy" style={{ color: "#000" }}>
-        <div className="label" style={{ color: "#000" }}>
+      <div className="cinema-energy" style={{ color: "#fff" }}>
+        <div className="label" style={{ color: "#fff" }}>
           CURRENT INTENSITY
         </div>
 
-        <div className="value" style={{ color: "#000", textShadow: "none" }}>
+        <div className="value" style={{ color: "#fff", textShadow: "none" }}>
           {intensity.toFixed(2)}
         </div>
 
@@ -170,13 +170,13 @@ export default function WireExperiment() {
           onChange={e => setIntensity(+e.target.value)}
         />
 
-        <div className="panel-hint" style={{ color: "#000" }}>
+        <div className="panel-hint" style={{ color: "#fff" }}>
           Use A / D keys
         </div>
 
         <div
           className="panel-section"
-          style={{ color: "#000", opacity: 1 }}
+          style={{ color: "#fff", opacity: 1 }}
         >
           CURRENT DIRECTION
         </div>
@@ -184,8 +184,8 @@ export default function WireExperiment() {
         <button
           className={`panel-btn ${direction === "same" ? "active" : ""}`}
           style={{
-            color: "#000",
-            borderColor: "#000"
+            color: "#fff",
+            borderColor: "#fff"
           }}
           onClick={() => setDirection("same")}
         >
@@ -195,8 +195,8 @@ export default function WireExperiment() {
         <button
           className={`panel-btn ${direction === "opposite" ? "active" : ""}`}
           style={{
-            color: "#000",
-            borderColor: "#000"
+            color: "#fff",
+            borderColor: "#fff"
           }}
           onClick={() => setDirection("opposite")}
         >

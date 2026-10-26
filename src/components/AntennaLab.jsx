@@ -42,24 +42,7 @@ const TITLES = Object.fromEntries(
   EXPERIMENTS.map(({ id, name }) => [id, name])
 );
 
-const CONCEPTS = {
-  dipole:
-    "Explore antenna geometry, current distribution, and electromagnetic radiation through an interactive canvas simulation.",
-  pattern:
-    "A radiation pattern describes how an antenna's radiation varies with direction.",
-  yagi:
-    "A Yagi-Uda antenna uses a driven element, reflector, and directors to produce directional radiation.",
-  dish:
-    "A parabolic reflector concentrates radiation into a narrower beam. Practical performance depends on reflector size, wavelength, efficiency, and feed geometry.",
-  array:
-    "A phased array changes the relative phase of signals from multiple antenna elements. Their fields combine to create directional interference patterns.",
-  transmission:
-    "Observe a schematic of a transmitting antenna, propagating wavefronts, and a receiving antenna.",
-  frequency:
-    "Wavelength is inversely proportional to frequency. Increasing frequency decreases wavelength in free space.",
-  polarization:
-    "Polarization describes the orientation and evolution of an electromagnetic wave's electric-field vector.",
-};
+ 
 
 const DEFAULTS = {
   frequency: 100,
@@ -165,10 +148,7 @@ export default function AntennaLab() {
           <ActiveView {...settings} paused={paused} />
         </section>
 
-        <section className="antenna-concept">
-          <h3>CONCEPT CHECKPOINT</h3>
-          <p>{CONCEPTS[active]}</p>
-        </section>
+        
       </main>
 
       {/* RIGHT CONTROL PANEL */}
