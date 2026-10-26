@@ -518,3 +518,137 @@ canvas {
     margin-top: 20px;
   }
 }
+ 
+/* =========================================
+   OPTICAL LAB COLLAPSIBLE SIDEBAR
+========================================= */
+
+.dexter-root {
+  display: flex;
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: clip;
+}
+
+/* Sidebar */
+.dexter-root .control-panel {
+  box-sizing: border-box;
+  flex: 0 0 260px;
+  width: 260px;
+  min-width: 0;
+
+  overflow: hidden;
+
+  transition:
+    flex-basis 0.3s ease,
+    width 0.3s ease,
+    padding 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Main experiment area */
+.dexter-root .canvas-column {
+  flex: 1 1 0%;
+  width: 0;
+  min-width: 0;
+
+  transition: width 0.3s ease;
+}
+
+/* Canvas wrapper */
+.dexter-root .canvas-wrap {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Keep the canvas responsive */
+.dexter-root .canvas-wrap canvas {
+  display: block;
+  max-width: 100%;
+}
+
+/* Arrow toggle */
+.dexter-root .sidebar-toggle {
+  position: absolute;
+  top: 18px;
+  left: 246px;
+  z-index: 1000;
+
+  width: 30px;
+  height: 38px;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #0f172a;
+  color: #7dd3fc;
+
+  border: 1px solid #334155;
+  border-radius: 0 8px 8px 0;
+
+  font-size: 12px;
+  cursor: pointer;
+
+  transition:
+    left 0.3s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.dexter-root .sidebar-toggle:hover {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+.dexter-root .sidebar-toggle:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
+/* Collapsed sidebar */
+.dexter-root.sidebar-collapsed .control-panel {
+  flex-basis: 0;
+  width: 0;
+  padding-left: 0;
+  padding-right: 0;
+  border-left-width: 0;
+  border-right-width: 0;
+}
+
+/* Hide sidebar content while collapsed */
+.dexter-root.sidebar-collapsed .control-panel > * {
+  visibility: hidden;
+}
+
+/* Move arrow to the left edge */
+.dexter-root.sidebar-collapsed .sidebar-toggle {
+  left: 0;
+}
+
+/* Canvas takes all available width */
+.dexter-root.sidebar-collapsed .canvas-column {
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Tablet and mobile */
+@media (max-width: 768px) {
+  .dexter-root .control-panel {
+    flex-basis: 220px;
+    width: 220px;
+  }
+
+  .dexter-root .sidebar-toggle {
+    left: 206px;
+  }
+
+  .dexter-root.sidebar-collapsed .sidebar-toggle {
+    left: 0;
+  }
+}
+ 
